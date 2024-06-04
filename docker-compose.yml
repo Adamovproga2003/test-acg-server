@@ -1,0 +1,48 @@
+version: '3' 
+services:
+  mysql:
+    image: mysql:latest
+    container_name: mysql_db
+    environment:
+      MYSQL_ROOT_PASSWORD: systemDBpassword
+      MYSQL_DATABASE: acg_db
+      MYSQL_USER: serverConnection
+      MYSQL_PASSWORD: serverConnection
+    ports:
+      - "3307:3306"
+
+  node_app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    depends_on:
+      - mysql
+    environment:
+      - APP_ID=00000000-0000-4000-8000-000000000000 
+      - NODE_ENV=development
+      - APP_PORT=3001
+      - DOMAIN=localhost:3090 
+      - MYSQL_HOST=mysql_db
+      - MYSQL_PORT=3306
+      - MYSQL_USERNAME=serverConnection
+      - MYSQL_PASSWORD=serverConnection
+      - MYSQL_DATABASE=acg_db
+      - MONGO_CONNECTION_STRING=mongodb+srv://ACG_server:1LZNEbYJ8SNT2x4E@landing.q5jufww.mongodb.net/landing?retryWrites=true&w=majority
+      - JWT_ACCESS_TIME=600
+      - JWT_CONFIRMATION_SECRET=ACG_SECRET_STRING1 
+      - JWT_CONFIRMATION_TIME=3600
+      - JWT_RESET_PASSWORD_SECRET=ACG_SECRET_STRING2 
+      - JWT_RESET_PASSWORD_TIME=1800
+      - JWT_REFRESH_SECRET=ACG_SECRET_STRING3 
+      - JWT_REFRESH_TIME=604800
+      - REFRESH_COOKIE=rf 
+      - COOKIE_SECRET=ACG_SECRET_STRING4 
+      - EMAIL_HOST=smtp.gmail.com 
+      - EMAIL_PORT=465
+      - EMAIL_SECURE=true
+      - EMAIL_USER=daniilpenkovskiy@gmail.com 
+      - EMAIL_PASSWORD=yvqc qxtl qobn idiq 
+
+
