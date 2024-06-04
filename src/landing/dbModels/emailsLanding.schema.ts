@@ -4,7 +4,7 @@ import { HydratedDocument } from 'mongoose';
 
 export type EmailDocument = HydratedDocument<Email>;
 
-@Schema({ collection: 'emails' })
+@Schema({ collection: 'statistics' })
 export class Email{
   @Prop({
     default: () => uuidv4(),
@@ -13,12 +13,30 @@ export class Email{
     primaryKey: true,
   })
   _id: string;
-
+  @Prop({ default: Date.now })
+  createdAt: Date;
+  
+  @Prop([String])
+  emails: string[];
   @Prop({
-    allowNull: false,
-    unique: true
+    allowNull: true,
+    unique: false
   })
-  email: string;
+  country: string;
+  @Prop({
+    allowNull: true,
+    unique: false
+  })
+  timezone: string;
+  @Prop({
+    allowNull: true,
+    unique: false
+  })
+  ip: string;
+  @Prop({ default: false })
+  isLearnMore: boolean;
+  @Prop({ default: false })
+  isGetDemo: boolean;
 }
 
 export const EmailSchema = SchemaFactory.createForClass(Email);

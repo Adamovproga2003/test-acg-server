@@ -1,5 +1,5 @@
 import { Controller, Get, Res } from '@nestjs/common';
-import { Response } from 'express';
+import { Response } from 'express-serve-static-core';
 import { CsrfService } from './csrf.service';
 
 @Controller('csrf-token')
