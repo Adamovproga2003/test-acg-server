@@ -31,7 +31,7 @@ constructor(
     private readonly configService: ConfigService,
     private chatService: ChatService,
     ) {}
-    /*
+    
     @Post('/mentor')
     @ApiCreatedResponse({
         description: 'Send users message and returns the answer',
@@ -48,5 +48,5 @@ constructor(
     ): Promise<> {
         return await this.chatService.sendMessage(chatMentorDto);
     }
-    */
+    
 }
