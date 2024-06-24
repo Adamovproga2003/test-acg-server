@@ -1,6 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsString, Length, Matches, MinLength } from 'class-validator';
-import { PASSWORD_REGEX } from '../../common/consts/regex.const';
+import { ApiProperty } from '@nestjs/swagger'
+import { IsString, MinLength } from 'class-validator'
 
 export abstract class ChatMentorDto {
   @ApiProperty({

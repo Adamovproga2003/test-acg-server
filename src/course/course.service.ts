@@ -1,25 +1,20 @@
 import {
     BadRequestException,
-    ConflictException,
-    Injectable,
-    UnauthorizedException,
-} from '@nestjs/common';
-import { InjectModel } from '@nestjs/sequelize';
-import { CourseEntity } from './entities/course.entity';
-import { TopicEntity } from './entities/topic.entity';
-import { SubtopicEntity } from './entities/subtopic.entity';
-import { SubtopicLinkEntity } from './entities/subtopicLinks.entity';
-import { IPlan } from './interfaces/plan.іnterface';
-import { v4 as uuidv4, validate } from 'uuid';
-import { isNull, isUndefined } from '../common/utils/validation.util';
-import { ITopic } from './interfaces/topic.interface';
-import { ISubTopic } from './interfaces/subtopic.interface';
-import { CommonService } from '../common/common.service';
-import { IResponseCourseMapper } from './mappers/responseCourse.mapper';
-import { IResponseTopicMapper } from './mappers/responseTopic.mapper';
+    Injectable
+} from '@nestjs/common'
+import { InjectModel } from '@nestjs/sequelize'
+import { validate } from 'uuid'
+import { CommonService } from '../common/common.service'
+import { CourseEntity } from './entities/course.entity'
+import { SubtopicEntity } from './entities/subtopic.entity'
+import { SubtopicLinkEntity } from './entities/subtopicLinks.entity'
+import { TopicEntity } from './entities/topic.entity'
+import { IResponseCourseMapper } from './mappers/responseCourse.mapper'
+import { IResponseTopicMapper } from './mappers/responseTopic.mapper'
 
-import { GetCourseById } from './dtos/getCourseById.params';
-import { ApiHttpService } from 'src/api/api.service';
+import { ApiHttpService } from 'src/api/api.service'
+import { GetCourseById } from './dtos/getCourseById.params'
+import { IPlan } from './interfaces/plan.іnterface'
   
 @Injectable()
 export class CourseService {
@@ -35,46 +30,42 @@ constructor(
     private readonly commonService: CommonService,
     private readonly api: ApiHttpService,
 ) {}
-public async createCourse(userId:string, descriptionChat:string, plan:IPlan): Promise<CourseEntity> {
+public async createCourse(userId:string, descriptionChat:string, plan: IPlan): Promise<CourseEntity> {
     const course = await this.courseModel.create({
         userId: userId,
         active:true
     });
-    let topics = plan.topics;
-    for (let i=0;i<topics.length;i++ ) {
-        this.createTopic(userId, descriptionChat, course.courseId, topics[i])
-    }
+
+    Object.keys(plan).forEach(async key => {
+        await this.createTopic(userId, descriptionChat, course.courseId, key, plan[key])
+    })
     return course;
 }
 
-public async createTopic(userId:string, descriptionChat:string,courseId:string, topic:ITopic): Promise<TopicEntity> {
+public async createTopic(userId:string, descriptionChat:string,courseId:string, topic: string, subtopics: string[]): Promise<TopicEntity> {
     const topicBD = await this.topicModel.create({
         courseId: courseId,
-        title: topic.title
+        title: topic
     });
-    let subtopics = topic.subTopics;
-    let subtopicsTitles = [];
-    subtopics.forEach(subtopic=>{
-        subtopicsTitles.push(subtopic.title)
-    });
-    let links = this.generateSubtopicLinks(userId,subtopicsTitles, descriptionChat);
+
+    let links = await this.generateSubtopicLinks(userId, subtopics, descriptionChat);
     
 
     for (let i=0;i<subtopics.length;i++ ) {
         let subtopicLinks = [links[i]];
 
-        this.createSubtopic(topicBD.topicId, subtopics[i],subtopicLinks)
+        await this.createSubtopic(topicBD.topicId, subtopics[i],subtopicLinks)
     }
     return topicBD;
 }
 
-public async createSubtopic(topicId:string, subTopic:ISubTopic, links:any): Promise<SubtopicEntity> {
+public async createSubtopic(topicId:string, subTopic:string, links:any): Promise<SubtopicEntity> {
     const subTopicBD = await this.subtopicModel.create({
         topicId: topicId,
-        title: subTopic.title
+        title: subTopic
     });
     for(let i=0;i<links.links.length;i++){
-        this.createSubtopicLink(subTopicBD.subtopicId,links.links[i],links.brief[i])
+        await this.createSubtopicLink(subTopicBD.subtopicId,links.links[i],links.brief[i])
     }
     return subTopicBD;
 }
@@ -89,10 +80,10 @@ public async createSubtopicLink(subTopicId:string, link:string, brief:string): P
 }
 
 public async generateSubtopicLinks(userId:string,subtopics:string[] ,descriptionChat:string): Promise<any>{
-    let links = await this.api.axiosRef.post<any>(`/course/topic`, {
-        userId,
-        subtopics,
-        descriptionChat,
+    let links = await this.api.axiosRef.post<any>(`/course/links/`, {
+        user_id: userId,
+        topics: subtopics,
+        description: descriptionChat,
     });
     return links;
 }

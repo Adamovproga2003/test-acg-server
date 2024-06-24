@@ -1,10 +1,12 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/sequelize';
-import { ApiHttpService } from 'src/api/api.service';
-import { MessageEntity } from 'src/message/entities/message.entity';
-import { validate } from 'uuid';
-import { ChatMentorDto } from './dtos/chatMentorDto';
-import { ChatEntity } from './entities/chat.entity';
+import { BadRequestException, Injectable } from '@nestjs/common'
+import { InjectModel } from '@nestjs/sequelize'
+import { ApiHttpService } from 'src/api/api.service'
+import { CourseService } from 'src/course/course.service'
+import { IPlan } from 'src/course/interfaces/plan.іnterface'
+import { MessageEntity } from 'src/message/entities/message.entity'
+import { validate } from 'uuid'
+import { ChatMentorDto } from './dtos/chatMentorDto'
+import { ChatEntity } from './entities/chat.entity'
 
 type History = { bot: string } | { user: string };
 
@@ -15,6 +17,7 @@ export class ChatService {
     @InjectModel(MessageEntity)
     private readonly messageModel: typeof MessageEntity,
     private readonly api: ApiHttpService,
+    private readonly courseService: CourseService,
   ) {}
   async getChatById(chat_id: string): Promise<ChatEntity> {
     if (!validate(chat_id)) {
@@ -84,9 +87,7 @@ export class ChatService {
       return { chatId, text, flag, history };
     } catch (error) {
       const { response } = error;
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { request, ...errorObject } = response;
-      console.error(errorObject);
+      console.error(response);
       return error;
     }
   }
@@ -106,26 +107,24 @@ export class ChatService {
     );
 
     type IResponse = {
-      description: string;
-      plan: {
-        [topic: string]: string[];
-      };
+      dialog_description: string;
+      plan: IPlan;
     };
 
     try {
       const {
-        data: { description, plan },
+        data: { dialog_description, plan },
       } = await this.api.axiosRef.post<IResponse>(`chat/generate_plan`, {
         user_id,
         history,
       });
 
-      return { description, plan };
+      const {courseId} = await this.courseService.createCourse(user_id, dialog_description, plan)
+
+      return { dialog_description, plan, courseId };
     } catch (error) {
       const { response } = error;
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { request, ...errorObject } = response;
-      console.error(errorObject);
+      console.error(response);
       return error;
     }
   }
