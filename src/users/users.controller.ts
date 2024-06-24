@@ -119,4 +119,23 @@ export class UsersController {
         .status(HttpStatus.NO_CONTENT)
         .send();
     }
+
+    @Public()
+    @Delete('/:email')
+    @ApiNoContentResponse({
+        description: 'The user is deleted.',
+    })
+    @ApiBadRequestResponse({
+        description: 'Something is invalid on the request body, or wrong password.',
+    })
+    @ApiUnauthorizedResponse({
+        description: 'The user is not logged in.',
+    })
+    public async deleteUserDev(@Param() params: GetUserEmail,@Res() res: Response,):Promise<void> {
+        await this.usersService.deleteByEmailDev(params.email);
+        res
+        .clearCookie(this.cookieName, { path: this.cookiePath })
+        .status(HttpStatus.NO_CONTENT)
+        .send();
+    }
 }
