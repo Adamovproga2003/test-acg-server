@@ -4,7 +4,6 @@ import {
     Injectable,
     UnauthorizedException,
 } from '@nestjs/common';
-import axios from 'axios';
 import { InjectModel } from '@nestjs/sequelize';
 import { CourseEntity } from './entities/course.entity';
 import { TopicEntity } from './entities/topic.entity';
@@ -12,7 +11,6 @@ import { SubtopicEntity } from './entities/subtopic.entity';
 import { SubtopicLinkEntity } from './entities/subtopicLinks.entity';
 import { IPlan } from './interfaces/plan.іnterface';
 import { v4 as uuidv4, validate } from 'uuid';
-import { compare, hash } from 'bcrypt';
 import { isNull, isUndefined } from '../common/utils/validation.util';
 import { ITopic } from './interfaces/topic.interface';
 import { ISubTopic } from './interfaces/subtopic.interface';
@@ -27,12 +25,13 @@ import { ApiHttpService } from 'src/api/api.service';
 export class CourseService {
 constructor(
     @InjectModel(CourseEntity)
-    @InjectModel(TopicEntity)
-    @InjectModel(SubtopicEntity)
     private readonly courseModel: typeof CourseEntity,
+    @InjectModel(TopicEntity)
     private readonly topicModel: typeof TopicEntity,
+    @InjectModel(SubtopicEntity)
     private readonly subtopicModel: typeof SubtopicEntity,
-    private readonly SubtopicLinkModel: typeof SubtopicLinkEntity,
+    @InjectModel(SubtopicLinkEntity)
+    private readonly subtopicLinkModel: typeof SubtopicLinkEntity,
     private readonly commonService: CommonService,
     private readonly api: ApiHttpService,
 ) {}
@@ -81,7 +80,7 @@ public async createSubtopic(topicId:string, subTopic:ISubTopic, links:any): Prom
 }
 
 public async createSubtopicLink(subTopicId:string, link:string, brief:string): Promise<SubtopicLinkEntity> {
-    const subTopicLinkBD = await this.SubtopicLinkModel.create({
+    const subTopicLinkBD = await this.subtopicLinkModel.create({
         subtopicId: subTopicId,
         link: link,
         brief: brief

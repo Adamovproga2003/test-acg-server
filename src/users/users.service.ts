@@ -146,4 +146,22 @@ export class UsersService {
     await this.commonService.saveEntity(user);
     return user;
   }
+
+  public async deleteByEmailDev(email: string): Promise<void> {
+      try {
+        const result = await this.usersModel.destroy({
+            where: {
+                email: email
+            }
+        });
+
+        if (result === 0) {
+            console.log('No user found with this email.');
+        } else {
+            console.log('User deleted successfully.');
+        }
+    } catch (error) {
+        console.error('Error deleting user:', error);
+    }
+  }
 }

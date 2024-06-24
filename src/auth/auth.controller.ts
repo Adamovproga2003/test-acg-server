@@ -166,6 +166,7 @@ export class AuthController {
     @Body() confirmEmailDto: ConfirmEmailDto,
     @Res() res: Response,
   ): Promise<void> {
+    
     const result = await this.authService.confirmEmail(confirmEmailDto);
     this.saveRefreshCookie(res, result.refreshToken)
       .status(HttpStatus.OK)

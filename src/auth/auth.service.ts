@@ -44,6 +44,7 @@ export class AuthService {
       TokenTypeEnum.CONFIRMATION,
       domain,
     );
+    console.log(confirmationToken)
     this.mailerService.sendConfirmationEmail(user, confirmationToken);
     return this.commonService.generateMessage('Registration successful');
   }
@@ -53,10 +54,12 @@ export class AuthService {
     domain?: string,
   ): Promise<IAuthResult> {
     const { confirmationToken } = dto;
+    console.log(confirmationToken)
     const { user_id } = await this.jwtService.verifyToken<IEmailToken>(
       confirmationToken,
       TokenTypeEnum.CONFIRMATION,
     );
+    console.log(user_id)
     const user = await this.usersService.confirmEmail(user_id);
     const [accessToken, refreshToken] = await this.generateAuthTokens(
       user,

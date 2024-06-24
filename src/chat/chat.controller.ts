@@ -29,6 +29,7 @@ export class ChatController {
     @Body() chatMentorDto: ChatMentorDto,
     @CurrentUser() user_id: string,
   ): Promise<any> {
+    console.log(user_id)
     return await this.chatService.sendMessage(chatMentorDto, user_id);
   }
 

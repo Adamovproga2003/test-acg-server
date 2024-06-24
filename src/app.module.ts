@@ -21,6 +21,7 @@ import { AuthGuard } from './auth/auth.guard';
 import { ChatModule } from './chat/chat.module';
 import { CommonModule } from './common/common.module';
 import { JwtModule } from './jwt/jwt.module';
+import { CourseModule } from './course/course.module';
 
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import { JwtModule } from './jwt/jwt.module';
     JwtModule,
     MailerModule,
     ChatModule,
+    CourseModule
   ],
   providers: [
     CsrfService,
