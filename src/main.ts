@@ -12,8 +12,8 @@ async function bootstrap() {
   
   app.enableCors({ 
     //"origin": "https://artcogen.com:3000",
-    "origin": "http://localhost:3000",
-    "methods": "GET,POST,DELETE",
+    //"origin": "http://localhost:3000",
+    //"methods": "GET,POST,DELETE",
     "credentials":true
   });
   
