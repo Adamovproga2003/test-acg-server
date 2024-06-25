@@ -7,7 +7,7 @@ import { ApiHttpService } from './api.service';
   imports: [
     HttpModule.registerAsync({
       useFactory: () => ({
-        baseURL: `http://localhost:8000/`,
+        baseURL: `http://host.docker.internal:8000/`,
         headers: { 'Content-Type': 'application/json' },
       }),
     }),

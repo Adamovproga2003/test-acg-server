@@ -19,6 +19,17 @@ export class ChatService {
     private readonly api: ApiHttpService,
     private readonly courseService: CourseService,
   ) {}
+  async getUserChats(user_id): Promise<ChatEntity[]> {
+    const chats = await this.chatModel.findAll({
+      where: {
+        userId: user_id,
+      },
+      order: [['createdAt', 'ASC']],
+      attributes: ['chatId']
+    });
+    return chats;
+  }
+  
   async getChatById(chat_id: string): Promise<ChatEntity> {
     if (!validate(chat_id)) {
       throw new BadRequestException('Invalid id');

@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Post } from '@nestjs/common';
+import { Body, Controller, Param, Post, Get } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiCreatedResponse,
@@ -66,5 +66,37 @@ export class ChatController {
     @Param('id') chat_id: string,
   ): Promise<any> {
     return await this.chatService.generatePlan(user_id, chat_id);
+  }
+
+  @Get('/:id')
+  @ApiCreatedResponse({
+    description: 'Get chat by id',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'The user is not logged in.',
+  })
+  @ApiBadRequestResponse({
+    description: 'Something is invalid on the request body',
+  })
+  public async getChatById(
+    @Param('id') chat_id: string,
+  ): Promise<any> {
+    return await this.chatService.getChatById(chat_id);
+  }
+
+  @Get('/chats')
+  @ApiCreatedResponse({
+    description: 'Get chats',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'The user is not logged in.',
+  })
+  @ApiBadRequestResponse({
+    description: 'Something is invalid on the request body',
+  })
+  public async getUserChats(
+    @CurrentUser() user_id: string,
+  ): Promise<any> {
+    return await this.chatService.getUserChats(user_id);
   }
 }
