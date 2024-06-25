@@ -7,7 +7,7 @@ import { ApiHttpService } from './api.service';
   imports: [
     HttpModule.registerAsync({
       useFactory: () => ({
-        baseURL: `http://${process.env.ACG_HOST}:${process.env.ACG_PORT}/`,
+        baseURL: `http://localhost:8000/`,
         headers: { 'Content-Type': 'application/json' },
       }),
     }),
