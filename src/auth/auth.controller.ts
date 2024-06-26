@@ -97,7 +97,6 @@ export class AuthController {
         .status(HttpStatus.OK)
         .json(AuthResponseMapper.map(result));
     }
-
   @Public()
   @Post('/refresh-access')
   @ApiOkResponse({
@@ -245,8 +244,7 @@ export class AuthController {
 
   private refreshTokenFromReq(req: Request): string {
     const token: string | undefined = req.signedCookies[this.cookieName];
-    console.log(req.signedCookies)
-    console.log(token)
+
     if (isUndefined(token)) {
       throw new UnauthorizedException();
     }
@@ -258,10 +256,9 @@ export class AuthController {
     return res.cookie(this.cookieName, refreshToken, {
       secure: !this.testing,
       httpOnly: true,
-      sameSite: 'none',
+      sameSite: 'strict',
       signed: true,
-      //path: this.cookiePath,
-      path: '/',
+      path: this.cookiePath,
       expires: new Date(Date.now() + this.refreshTime * 1000),
     });
   }
