@@ -41,7 +41,7 @@ import { Request, Response } from 'express-serve-static-core';
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
-    private readonly cookiePath = '/auth';
+    private readonly cookiePath = '/';
     private readonly cookieName: string;
     private readonly refreshTime: number;
     private readonly testing: boolean;
@@ -245,7 +245,7 @@ export class AuthController {
   private refreshTokenFromReq(req: Request): string {
     const token: string | undefined = req.signedCookies[this.cookieName];
     console.log(token)
-    console.log(req)
+    console.log(req.signedCookies)
     console.log(this.cookieName)
 
     if (isUndefined(token)) {
@@ -257,6 +257,7 @@ export class AuthController {
 
   private saveRefreshCookie(res: Response, refreshToken: string): Response {
     console.log(`refreshToken${refreshToken}`)
+    console.log(!this.testing)
     return res.cookie(this.cookieName, refreshToken, {
       secure: !this.testing,
       httpOnly: true,
