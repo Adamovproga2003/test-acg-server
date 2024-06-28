@@ -12,6 +12,7 @@ import {
   Inject,
   Injectable,
   UnauthorizedException,
+  NotFoundException
 } from '@nestjs/common';
 import { CommonService } from '../common/common.service';
 import { IMessage } from '../common/interfaces/message.interface';
@@ -134,6 +135,9 @@ export class AuthService {
         domain,
       );
       this.mailerService.sendResetPasswordEmail(user, resetToken);
+    }
+    else {
+      throw new NotFoundException('User with this email not found');
     }
 
     return this.commonService.generateMessage('Reset password email sent');
