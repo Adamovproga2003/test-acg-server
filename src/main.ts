@@ -10,14 +10,16 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
   
+  app.use(cookieParser(configService.get<string>('COOKIE_SECRET')));
+
   app.enableCors({ 
-    //"origin": "https://artcogen.com:3000",
+    //"origin": "https://artcogen.com",
     "origin": "http://localhost:3000",
-    "methods": "GET,POST,DELETE",
+    //"methods": "GET,POST,DELETE",
     "credentials":true
   });
   
-  app.use(cookieParser(configService.get<string>('COOKIE_SECRET')));
+  
   
   const config = new DocumentBuilder()
   .setTitle('ACG API')

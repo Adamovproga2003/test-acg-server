@@ -1,14 +1,13 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-import { SequelizeModule } from '@nestjs/sequelize';
-import { LandingModule } from './landing/landing.module';
-import { ConfigModule, ConfigService  } from '@nestjs/config';
-import { validationSchema } from './config/config.schema';
-import { config } from './config/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
-import { ThrottlerModule } from '@nestjs/throttler';
-import { CsrfService } from './csrf/csrf.service';
-import { CsrfController } from './csrf/csrf.controller';
+import { SequelizeModule } from '@nestjs/sequelize';
 import { AuthModule } from './auth/auth.module';
+import { config } from './config/config';
+import { validationSchema } from './config/config.schema';
+import { CsrfController } from './csrf/csrf.controller';
+import { CsrfService } from './csrf/csrf.service';
+import { LandingModule } from './landing/landing.module';
 import { UsersModule } from './users/users.module';
 
 import { AppController } from './app.controller';
@@ -17,19 +16,21 @@ import { AppService } from './app.service';
 import { MailerModule } from './mailer/mailer.module';
 
 import { APP_GUARD } from '@nestjs/core';
+import { ApiModule } from './api/api.module';
 import { AuthGuard } from './auth/auth.guard';
-import { JwtModule } from './jwt/jwt.module';
-import { CommonModule } from './common/common.module';
 import { ChatModule } from './chat/chat.module';
-
+import { CommonModule } from './common/common.module';
+import { JwtModule } from './jwt/jwt.module';
+import { CourseModule } from './course/course.module';
 
 @Module({
   imports: [
+    ApiModule,
     ConfigModule.forRoot({
       isGlobal: true,
       validationSchema,
       load: [config],
-    }), 
+    }),
     SequelizeModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
@@ -45,7 +46,8 @@ import { ChatModule } from './chat/chat.module';
       inject: [ConfigService],
     }),
     MongooseModule.forRoot(
-      'mongodb+srv://ACG_server:1LZNEbYJ8SNT2x4E@landing.q5jufww.mongodb.net/landing?retryWrites=true&w=majority'),
+      'mongodb+srv://ACG_server:1LZNEbYJ8SNT2x4E@landing.q5jufww.mongodb.net/landing?retryWrites=true&w=majority',
+    ),
     LandingModule,
     CommonModule,
     UsersModule,
@@ -53,16 +55,17 @@ import { ChatModule } from './chat/chat.module';
     JwtModule,
     MailerModule,
     ChatModule,
-
-  
-],
-providers: [CsrfService,AppService,
-  {
-    provide: APP_GUARD,
-    useClass: AuthGuard,
-  },
-],
-controllers: [CsrfController,AppController]
+    CourseModule
+  ],
+  providers: [
+    CsrfService,
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
+  ],
+  controllers: [CsrfController, AppController],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

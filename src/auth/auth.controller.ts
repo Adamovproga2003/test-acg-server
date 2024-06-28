@@ -41,7 +41,7 @@ import { Request, Response } from 'express-serve-static-core';
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
-    private readonly cookiePath = '/ACG/AUTH';
+    private readonly cookiePath = '/';
     private readonly cookieName: string;
     private readonly refreshTime: number;
     private readonly testing: boolean;
@@ -98,7 +98,7 @@ export class AuthController {
         .json(AuthResponseMapper.map(result));
     }
   @Public()
-  @Post('/refresh-access')
+  @Get('/refresh-access')
   @ApiOkResponse({
     type: AuthResponseMapper,
     description: 'Refreshes and returns the access token',
@@ -166,6 +166,7 @@ export class AuthController {
     @Body() confirmEmailDto: ConfirmEmailDto,
     @Res() res: Response,
   ): Promise<void> {
+    
     const result = await this.authService.confirmEmail(confirmEmailDto);
     this.saveRefreshCookie(res, result.refreshToken)
       .status(HttpStatus.OK)
@@ -243,6 +244,9 @@ export class AuthController {
 
   private refreshTokenFromReq(req: Request): string {
     const token: string | undefined = req.signedCookies[this.cookieName];
+    console.log(token)
+    console.log(req.signedCookies)
+    console.log(this.cookieName)
 
     if (isUndefined(token)) {
       throw new UnauthorizedException();
@@ -252,10 +256,12 @@ export class AuthController {
   }
 
   private saveRefreshCookie(res: Response, refreshToken: string): Response {
+    console.log(`refreshToken${refreshToken}`)
+    console.log(!this.testing)
     return res.cookie(this.cookieName, refreshToken, {
       secure: !this.testing,
       httpOnly: true,
-      sameSite: 'strict',
+      sameSite: 'none',
       signed: true,
       path: this.cookiePath,
       expires: new Date(Date.now() + this.refreshTime * 1000),

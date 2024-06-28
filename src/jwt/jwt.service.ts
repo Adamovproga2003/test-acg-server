@@ -58,8 +58,10 @@ import {
     ): Promise<T> {
       return new Promise((resolve, rejects) => {
         jwt.verify(token, secret, options, (error, payload: T) => {
+          console.log(payload)
           if (error) {
             rejects(error);
+            console.log('here');
             return;
           }
           resolve(payload);
@@ -92,7 +94,7 @@ import {
       const jwtOptions: jwt.SignOptions = {
         issuer: this.issuer,
         subject: user.email,
-        audience: domain ?? this.domain,
+        //audience: domain ?? this.domain,
         algorithm: 'HS256',
       };
   
@@ -143,7 +145,7 @@ import {
     >(token: string, tokenType: TokenTypeEnum): Promise<T> {
       const jwtOptions: jwt.VerifyOptions = {
         issuer: this.issuer,
-        audience: new RegExp(this.domain),
+        //audience: new RegExp(this.domain),
       };
   
       switch (tokenType) {

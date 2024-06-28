@@ -1,52 +1,102 @@
+import { Body, Controller, Param, Post, Get } from '@nestjs/common';
 import {
-    Body,
-    Controller,
-    Get,
-    HttpCode,
-    HttpStatus,
-    Post,
-    Req,
-    Res,
-    Patch,
-    UnauthorizedException,
-} from '@nestjs/common';
-import {
-    ApiBadRequestResponse,
-    ApiConflictResponse,
-    ApiCreatedResponse,
-    ApiOkResponse,
-    ApiTags,
-    ApiUnauthorizedResponse,
+  ApiBadRequestResponse,
+  ApiCreatedResponse,
+  ApiTags,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 
+import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 import { ChatService } from './chat.service';
-import { ConfigService } from '@nestjs/config';
-import { ChatMentorDto } from './dtos/chatMentorDto'
-
+import { ChatMentorDto } from './dtos/chatMentorDto';
 
 @ApiTags('Chat')
 @Controller('chat')
 export class ChatController {
-constructor(
-    private readonly configService: ConfigService,
-    private chatService: ChatService,
-    ) {}
-    /*
-    @Post('/mentor')
-    @ApiCreatedResponse({
-        description: 'Send users message and returns the answer',
-    })
-    @ApiUnauthorizedResponse({
-        description: 'The user is not logged in.',
-    })
-    @ApiBadRequestResponse({
-        description: 'Something is invalid on the request body',
-    })
-    public async mentor(
-        @Body() chatMentorDto: ChatMentorDto,
+  constructor(private chatService: ChatService) {}
 
-    ): Promise<> {
-        return await this.chatService.sendMessage(chatMentorDto);
-    }
-    */
+  @Post('/')
+  @ApiCreatedResponse({
+    description: 'Send users message and returns the answer',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'The user is not logged in.',
+  })
+  @ApiBadRequestResponse({
+    description: 'Something is invalid on the request body',
+  })
+  public async init(
+    @Body() chatMentorDto: ChatMentorDto,
+    @CurrentUser() user_id: string,
+  ): Promise<any> {
+    console.log(user_id)
+    return await this.chatService.sendMessage(chatMentorDto, user_id);
+  }
+
+  @Post('/:id')
+  @ApiCreatedResponse({
+    description: 'Send users message and returns the answer',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'The user is not logged in.',
+  })
+  @ApiBadRequestResponse({
+    description: 'Something is invalid on the request body',
+  })
+  public async talk(
+    @Body() chatMentorDto: ChatMentorDto,
+    @CurrentUser() user_id: string,
+    @Param('id') chat_id: string,
+  ): Promise<any> {
+    return await this.chatService.sendMessage(chatMentorDto, user_id, chat_id);
+  }
+
+  @Post('/:id/plan')
+  @ApiCreatedResponse({
+    description: 'Get plan for user',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'The user is not logged in.',
+  })
+  @ApiBadRequestResponse({
+    description: 'Something is invalid on the request body',
+  })
+  public async plan(
+    @CurrentUser() user_id: string,
+    @Param('id') chat_id: string,
+  ): Promise<any> {
+    return await this.chatService.generatePlan(user_id, chat_id);
+  }
+
+  @Get('/:id')
+  @ApiCreatedResponse({
+    description: 'Get chat by id',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'The user is not logged in.',
+  })
+  @ApiBadRequestResponse({
+    description: 'Something is invalid on the request body',
+  })
+  public async getChatById(
+    @Param('id') chat_id: string,
+  ): Promise<any> {
+    return await this.chatService.getChatById(chat_id);
+  }
+
+  @Get('/chats')
+  @ApiCreatedResponse({
+    description: 'Get chats',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'The user is not logged in.',
+  })
+  @ApiBadRequestResponse({
+    description: 'Something is invalid on the request body',
+  })
+  public async getUserChats(
+    @CurrentUser() user_id: string,
+  ): Promise<any> {
+    return await this.chatService.getUserChats(user_id);
+  }
 }
