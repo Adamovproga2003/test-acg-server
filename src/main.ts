@@ -13,7 +13,7 @@ async function bootstrap() {
   app.use(cookieParser(configService.get<string>('COOKIE_SECRET')));
 
   app.enableCors({ 
-    //"origin": "https://artcogen.com:3000",
+    //"origin": "https://artcogen.com",
     "origin": "http://localhost:3000",
     //"methods": "GET,POST,DELETE",
     "credentials":true
