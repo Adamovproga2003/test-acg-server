@@ -261,7 +261,7 @@ export class AuthController {
     return res.cookie(this.cookieName, refreshToken, {
       secure: !this.testing,
       httpOnly: true,
-      sameSite: 'none',
+      sameSite: 'lax',
       signed: true,
       path: this.cookiePath,
       expires: new Date(Date.now() + this.refreshTime * 1000),
