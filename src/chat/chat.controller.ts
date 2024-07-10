@@ -51,23 +51,6 @@ export class ChatController {
     return await this.chatService.sendMessage(chatMentorDto, user_id, chat_id);
   }
 
-  @Post('/:id/plan')
-  @ApiCreatedResponse({
-    description: 'Get plan for user',
-  })
-  @ApiUnauthorizedResponse({
-    description: 'The user is not logged in.',
-  })
-  @ApiBadRequestResponse({
-    description: 'Something is invalid on the request body',
-  })
-  public async plan(
-    @CurrentUser() user_id: string,
-    @Param('id') chat_id: string,
-  ): Promise<any> {
-    return await this.chatService.generatePlan(user_id, chat_id);
-  }
-
   @Get('/:id')
   @ApiCreatedResponse({
     description: 'Get chat by id',
