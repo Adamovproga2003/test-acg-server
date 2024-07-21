@@ -62,11 +62,13 @@ export class AuthService {
     );
     console.log(user_id)
     const user = await this.usersService.confirmEmail(user_id);
+    const user2 = await this.userByEmail(user.email);
+
     const [accessToken, refreshToken] = await this.generateAuthTokens(
-      user,
+      user2,
       domain,
     );
-    return { user, accessToken, refreshToken };
+    return {accessToken, refreshToken };
   }
 
   public async signIn(dto: SignInDto, domain?: string): Promise<IAuthResult> {
@@ -92,7 +94,7 @@ export class AuthService {
       user,
       domain,
     );
-    return { user, accessToken, refreshToken };
+    return {accessToken, refreshToken };
   }
 
   public async refreshTokenAccess(
@@ -110,7 +112,7 @@ export class AuthService {
       domain,
       tokenId,
     );
-    return { user, accessToken, refreshToken: newRefreshToken };
+    return {accessToken, refreshToken: newRefreshToken };
   }
 
   public async logout(refreshToken: string): Promise<IMessage> {
@@ -170,7 +172,7 @@ export class AuthService {
       user,
       domain,
     );
-    return { user, accessToken, refreshToken };
+    return {accessToken, refreshToken };
   }
 
   

@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/sequelize'
 import { ApiHttpService } from 'src/api/api.service'
 import { CourseService } from 'src/course/course.service'
-import { IPlan } from 'src/course/interfaces/plan.іnterface'
+import { IPlan } from 'src/course/interfaces/plan.interface'
 import { MessageEntity } from 'src/message/entities/message.entity'
 import { validate } from 'uuid'
 import { ChatMentorDto } from './dtos/chatMentorDto'
@@ -14,9 +14,11 @@ type History = { bot: string } | { user: string };
 @Injectable()
 export class ChatService {
   constructor(
-    @InjectModel(ChatEntity) private readonly chatModel: typeof ChatEntity,
+    @InjectModel(ChatEntity) 
+    private readonly chatModel: typeof ChatEntity,
     @InjectModel(MessageEntity)
     private readonly messageModel: typeof MessageEntity,
+    @InjectModel(PlanEntity)
     private readonly planModel: typeof PlanEntity,
     private readonly api: ApiHttpService,
     private readonly courseService: CourseService,
