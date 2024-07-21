@@ -14,7 +14,7 @@ import { IResponseTopicMapper } from './mappers/responseTopic.mapper'
 
 import { ApiHttpService } from 'src/api/api.service'
 import { GetCourseById } from './dtos/getCourseById.params'
-import { IPlan } from './interfaces/plan.іnterface'
+import { IPlan } from './interfaces/plan.interface'
   
 @Injectable()
 export class CourseService {

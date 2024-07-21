@@ -2,20 +2,24 @@ import { BadRequestException, Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/sequelize'
 import { ApiHttpService } from 'src/api/api.service'
 import { CourseService } from 'src/course/course.service'
-import { IPlan } from 'src/course/interfaces/plan.іnterface'
+import { IPlan } from 'src/course/interfaces/plan.interface'
 import { MessageEntity } from 'src/message/entities/message.entity'
 import { validate } from 'uuid'
 import { ChatMentorDto } from './dtos/chatMentorDto'
 import { ChatEntity } from './entities/chat.entity'
+import { PlanEntity } from './entities/plan.entity'
 
 type History = { bot: string } | { user: string };
 
 @Injectable()
 export class ChatService {
   constructor(
-    @InjectModel(ChatEntity) private readonly chatModel: typeof ChatEntity,
+    @InjectModel(ChatEntity) 
+    private readonly chatModel: typeof ChatEntity,
     @InjectModel(MessageEntity)
     private readonly messageModel: typeof MessageEntity,
+    @InjectModel(PlanEntity)
+    private readonly planModel: typeof PlanEntity,
     private readonly api: ApiHttpService,
     private readonly courseService: CourseService,
   ) {}
@@ -49,6 +53,9 @@ export class ChatService {
         userId: user_id,
       });
       chatId = chat.chatId;
+      const plan = await this.planModel.create({
+        chatId: chatId,
+      });
     } else {
       // find all messages in the chat of the user and bot
       const messages = await this.messageModel.findAll({
@@ -72,13 +79,15 @@ export class ChatService {
 
     // request to ACG
     type IResponse = {
-      text: string;
-      flag: boolean;
+      answer: string;
+      summary: string | null;
+      plan_size: string | null;
+      fix: boolean | null;
     };
 
     try {
       const {
-        data: { text, flag },
+        data: { answer, summary, plan_size,fix },
       } = await this.api.axiosRef.post<IResponse>(`chat/mentor`, {
         user_input: ms,
         user_id,
@@ -88,21 +97,21 @@ export class ChatService {
       await this.messageModel.create({
         chatId,
         user: false,
-        text,
+        text: answer,
       });
 
-      if (flag) {
-        return this.generatePlan(user_id, chatId);
+      if (summary!= null) {
+        return this.generatePlan(user_id, chatId, summary, plan_size);
       }
 
-      return { chatId, text, flag, history };
+      return { chatId, answer, history, summary, plan_size, fix };
     } catch (error) {
       const { response } = error;
       console.error(response);
       return error;
     }
   }
-  async generatePlan(user_id: string, chat_id: string): Promise<any> {
+  async generatePlan(user_id: string, chat_id: string, summary: string, plan_size: string): Promise<any> {
     const history: History[] = [{ bot: 'Hello' }];
 
     const messages = await this.messageModel.findAll({
@@ -118,25 +127,29 @@ export class ChatService {
     );
 
     type IResponse = {
-      dialog_description: string;
       plan: IPlan;
     };
 
     try {
       const {
-        data: { dialog_description, plan },
+        data: { plan },
       } = await this.api.axiosRef.post<IResponse>(`chat/generate_plan`, {
         user_id,
-        history,
+        summary,
+        plan_size,
       });
 
-      const {courseId} = await this.courseService.createCourse(user_id, dialog_description, plan)
+      
 
-      return { dialog_description, plan, courseId };
+      return { summary, plan, plan_size };
     } catch (error) {
       const { response } = error;
       console.error(response);
       return error;
     }
+  }
+  async generateCourse(user_id: string, summary:string, plan:IPlan){
+    const {courseId} = await this.courseService.createCourse(user_id, summary, plan)
+    return { courseId };
   }
 }

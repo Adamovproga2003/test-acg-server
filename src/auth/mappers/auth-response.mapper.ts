@@ -24,7 +24,6 @@ export class AuthResponseMapper implements IAuthResponse {
 
   public static map(result: IAuthResult): AuthResponseMapper {
     return new AuthResponseMapper({
-      user: AuthResponseUserMapper.map(result.user),
       accessToken: result.accessToken,
     });
   }
