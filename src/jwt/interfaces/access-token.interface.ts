@@ -1,7 +1,7 @@
 import { ITokenBase } from './token-base.interface';
 
 export interface IAccessPayload {
-  user_id: string;
+  userId: string;
 }
 
 export interface IAccessToken extends IAccessPayload, ITokenBase {}

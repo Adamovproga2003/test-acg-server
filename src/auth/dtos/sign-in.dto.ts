@@ -3,15 +3,15 @@ import { IsString, Length, MinLength } from 'class-validator';
 
 export abstract class SignInDto {
   @ApiProperty({
-    description: 'Email',
-    examples: ['john.doe@gmail.com'],
+    description: 'Username or email',
+    examples: ['john_doe','john.doe@gmail.com'],
     minLength: 3,
     maxLength: 255,
     type: String,
   })
   @IsString()
   @Length(3, 255)
-  public email: string;
+  public usernameOrEmail: string;
 
   @ApiProperty({
     description: "User's password",
