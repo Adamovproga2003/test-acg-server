@@ -21,19 +21,20 @@ export class UsersService {
     private readonly commonService: CommonService,
   ) {}
 
-  public async create(email: string, name: string, password: string): Promise<UserEntity> {
+  public async create(email: string, username: string, password: string): Promise<UserEntity> {
     const formattedEmail = email.toLowerCase();
     await this.checkEmailUniqueness(formattedEmail);
+    await this.checkUserNameUniqueness(username);
     const user = await this.usersModel.create({
       email: formattedEmail,
-      name: name,
+      username: username,
       password: await hash(password, 10),
     });
     return user;
   }
 
-  public async delete(user_id: string, dto: PasswordDto): Promise<UserEntity> {
-    const user = await this.findOneById(user_id);
+  public async delete(userId: string, dto: PasswordDto): Promise<UserEntity> {
+    const user = await this.findOneById(userId);
 
     if (!(await compare(dto.password, user.password))) {
       throw new BadRequestException('Wrong password');
@@ -44,9 +45,9 @@ export class UsersService {
   }
 
   public async confirmEmail(
-    user_id: string,
+    userId: string,
   ): Promise<UserEntity> {
-    const user = await this.findOneById(user_id);
+    const user = await this.findOneById(userId);
 
     if (user.confirmed) {
       throw new BadRequestException('Email already confirmed');
@@ -57,8 +58,8 @@ export class UsersService {
     return user;
   }
 
-  public async update(user_id: string, dto: UpdateUserDto): Promise<UserEntity> {
-    const user = await this.findOneById(user_id);
+  public async update(userId: string, dto: UpdateUserDto): Promise<UserEntity> {
+    const user = await this.findOneById(userId);
     const { name} = dto;
 
     if (!isUndefined(name) && !isNull(name)) {
@@ -74,11 +75,11 @@ export class UsersService {
   }
 
   public async updatePassword(
-    user_id: string,
+    userId: string,
     password: string,
     newPassword: string,
   ): Promise<UserEntity> {
-    const user = await this.findOneById(user_id);
+    const user = await this.findOneById(userId);
 
     if (!(await compare(password, user.password))) {
       throw new BadRequestException('Wrong password');
@@ -117,6 +118,28 @@ export class UsersService {
     return user;
   }
 
+  public async findByUsername(
+    username: string,
+    forAuth = false,
+  ): Promise<UserEntity> {
+    let user = await this.usersModel.findOne({ where: { username } });
+
+    if (forAuth) {
+      this.throwUnauthorizedException(user);
+    } else {
+      this.commonService.checkEntityExistence(user, 'User');
+    }
+
+    return user;
+  }
+  
+  private async checkUserNameUniqueness(username: string): Promise<void> {
+    const count = await this.usersModel.count({where: { username: username }});
+
+    if (count > 0) {
+      throw new ConflictException('Username already in use');
+    }
+  }
   private async checkEmailUniqueness(email: string): Promise<void> {
     const count = await this.usersModel.count({where: { email: email }});
 
@@ -138,10 +161,10 @@ export class UsersService {
   }
 
   public async resetPassword(
-    user_id: string,
+    userId: string,
     password: string,
   ): Promise<UserEntity> {
-    const user = await this.findOneById(user_id);
+    const user = await this.findOneById(userId);
     user.password = await hash(password, 10);
     await this.commonService.saveEntity(user);
     return user;

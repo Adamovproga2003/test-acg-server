@@ -7,7 +7,7 @@ import {
   Table,
 } from 'sequelize-typescript';
 import { v4 as uuidv4 } from 'uuid';
-import { BCRYPT_HASH, NAME_REGEX } from '../../common/consts/regex.const';
+import { BCRYPT_HASH, NAME_REGEX, USERNAME_REGEX } from '../../common/consts/regex.const';
 
 @Table({ tableName: 'users' })
 export class UserEntity extends Model<UserEntity> {
@@ -16,17 +16,28 @@ export class UserEntity extends Model<UserEntity> {
     type: DataType.UUID,
     primaryKey: true,
   })
-  public user_id: string;
+  public userId: string;
 
   @Column({
     type: DataType.STRING(100),
-    allowNull: false,
+    allowNull: true,
     validate: {
       len: [3, 100],
       matches: NAME_REGEX,
     },
   })
   public name: string;
+
+  @Column({
+    type: DataType.STRING(100),
+    allowNull: false,
+    unique: true,
+    validate: {
+      len: [3, 100],
+      matches: USERNAME_REGEX,
+    },
+  })
+  public username: string;
 
   @Column({
     type: DataType.STRING(255),

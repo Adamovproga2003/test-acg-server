@@ -4,12 +4,6 @@ import { IUser } from '../interfaces/user.interface';
 
 export class ResponseUserMapper implements IResponseUser {
   @ApiProperty({
-    description: 'User id',
-    type: String,
-  })
-  public user_id: string;
-
-  @ApiProperty({
     description: 'User name',
     example: 'John Doe',
     minLength: 3,
@@ -40,7 +34,7 @@ export class ResponseUserMapper implements IResponseUser {
 
   public static map(user: IUser): ResponseUserMapper {
     return new ResponseUserMapper({
-      user_id: user.user_id,
+      username: user.username,
       name: user.name,
       createdAt: user.createdAt.toISOString(),
     });

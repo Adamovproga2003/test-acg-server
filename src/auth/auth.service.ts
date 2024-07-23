@@ -36,10 +36,10 @@ export class AuthService {
   ) {}
 
   public async signUp(dto: SignUpDto, domain?: string): Promise<IMessage> {
-    const { name, email, password1, password2 } = dto;
+    const { username, email, password1, password2 } = dto;
     this.comparePasswords(password1, password2);
 
-    const user = await this.usersService.create(email, name, password1);
+    const user = await this.usersService.create(email, username, password1);
     const confirmationToken = await this.jwtService.generateToken(
       user,
       TokenTypeEnum.CONFIRMATION,
@@ -56,13 +56,13 @@ export class AuthService {
   ): Promise<IAuthResult> {
     const { confirmationToken } = dto;
     console.log(confirmationToken)
-    const { user_id } = await this.jwtService.verifyToken<IEmailToken>(
+    const { userId } = await this.jwtService.verifyToken<IEmailToken>(
       confirmationToken,
       TokenTypeEnum.CONFIRMATION,
     );
-    console.log(user_id)
-    const user = await this.usersService.confirmEmail(user_id);
-    const user2 = await this.userByEmail(user.email);
+    console.log(userId)
+    const user = await this.usersService.confirmEmail(userId);
+    const user2 = await this.userByUsernameOrEmail(user.email);
 
     const [accessToken, refreshToken] = await this.generateAuthTokens(
       user2,
@@ -72,8 +72,8 @@ export class AuthService {
   }
 
   public async signIn(dto: SignInDto, domain?: string): Promise<IAuthResult> {
-    const { email, password } = dto;
-    const user = await this.userByEmail(email);
+    const { usernameOrEmail, password } = dto;
+    const user = await this.userByUsernameOrEmail(usernameOrEmail);
 
     if (!(await compare(password, user.password))) {
       throw new UnauthorizedException('Invalid credentials');
@@ -101,12 +101,12 @@ export class AuthService {
     refreshToken: string,
     domain?: string,
   ): Promise<IAuthResult> {
-    const { user_id, version, tokenId } =
+    const { userId, version, tokenId } =
       await this.jwtService.verifyToken<IRefreshToken>(
         refreshToken,
         TokenTypeEnum.REFRESH,
       );
-    const user = await this.usersService.findOneById(user_id);
+    const user = await this.usersService.findOneById(userId);
     const [accessToken, newRefreshToken] = await this.generateAuthTokens(
       user,
       domain,
@@ -116,7 +116,7 @@ export class AuthService {
   }
 
   public async logout(refreshToken: string): Promise<IMessage> {
-    const { user_id, tokenId, exp } =
+    const { userId, tokenId, exp } =
       await this.jwtService.verifyToken<IRefreshToken>(
         refreshToken,
         TokenTypeEnum.REFRESH,
@@ -147,24 +147,24 @@ export class AuthService {
 
   public async resetPassword(dto: ResetPasswordDto): Promise<IMessage> {
     const { password1, password2, resetToken } = dto;
-    const { user_id, version } = await this.jwtService.verifyToken<IEmailToken>(
+    const { userId, version } = await this.jwtService.verifyToken<IEmailToken>(
       resetToken,
       TokenTypeEnum.RESET_PASSWORD,
     );
     this.comparePasswords(password1, password2);
-    await this.usersService.resetPassword(user_id, password1);
+    await this.usersService.resetPassword(userId, password1);
     return this.commonService.generateMessage('Password reset successfully');
   }
 
   public async updatePassword(
-    user_id: string,
+    userId: string,
     dto: ChangePasswordDto,
     domain?: string,
   ): Promise<IAuthResult> {
     const { password1, password2, password } = dto;
     this.comparePasswords(password1, password2);
     const user = await this.usersService.updatePassword(
-      user_id,
+      userId,
       password,
       password1,
     );
@@ -182,27 +182,29 @@ export class AuthService {
       throw new BadRequestException('Passwords do not match');
     }
   }
-
-  private async userByEmail(
-    email: string,
+  
+  private async userByUsernameOrEmail(
+    emailOrUsername: string,
   ): Promise<UserEntity> {
-    if (email.includes('@')) {
-      if (!isEmail(email)) {
+    if (emailOrUsername.includes('@')) {
+      if (!isEmail(emailOrUsername)) {
         throw new BadRequestException('Invalid email');
       }
 
-      return this.usersService.findByEmail(email);
+      return this.usersService.findByEmail(emailOrUsername);
     }
 
     if (
-      email.length < 3 ||
-      email.length > 255
+      emailOrUsername.length < 3 ||
+      emailOrUsername.length > 106 ||
+      !SLUG_REGEX.test(emailOrUsername)
     ) {
-      throw new BadRequestException('Invalid Email');
+      throw new BadRequestException('Invalid username');
     }
 
-    return this.usersService.findByEmail(email);
+    return this.usersService.findByUsername(emailOrUsername, true);
   }
+  
 
   private async generateAuthTokens(
     user: UserEntity,
