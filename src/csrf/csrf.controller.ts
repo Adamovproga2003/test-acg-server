@@ -13,7 +13,7 @@ export class CsrfController {
       httpOnly: true,
       secure: true,
       
-      sameSite: 'none',
+      sameSite: 'lax',
       encode: String,
       //domain: 'artcogen.com',
       expires: new Date(Date.now() + 60 * 60 * 1000) 
