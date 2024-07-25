@@ -22,6 +22,7 @@ import { ChatModule } from './chat/chat.module';
 import { CommonModule } from './common/common.module';
 import { JwtModule } from './jwt/jwt.module';
 import { CourseModule } from './course/course.module';
+import { StaticModule } from './static/static.module';
 
 @Module({
   imports: [
@@ -55,7 +56,8 @@ import { CourseModule } from './course/course.module';
     JwtModule,
     MailerModule,
     ChatModule,
-    CourseModule
+    CourseModule,
+    StaticModule
   ],
   providers: [
     CsrfService,
@@ -64,6 +66,7 @@ import { CourseModule } from './course/course.module';
       provide: APP_GUARD,
       useClass: AuthGuard,
     },
+    
   ],
   controllers: [CsrfController, AppController],
 })

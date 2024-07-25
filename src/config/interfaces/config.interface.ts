@@ -10,6 +10,7 @@ export interface IConfig {
   sequelizeConfig: ISequelizeConfig;
   jwt: IJwt;
   domain: string;
+  apiDomain: string;
   emailService: IEmailConfig;
   api: IApiConfig;
 }

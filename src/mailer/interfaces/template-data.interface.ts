@@ -1,4 +1,4 @@
 export interface ITemplatedData {
-    name: string;
-    link: string;
-  }
+  link: string;
+  imageStorageLink: string;
+}
