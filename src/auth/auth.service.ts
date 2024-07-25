@@ -186,6 +186,7 @@ export class AuthService {
   private async userByUsernameOrEmail(
     emailOrUsername: string,
   ): Promise<UserEntity> {
+    console.log(emailOrUsername)
     if (emailOrUsername.includes('@')) {
       if (!isEmail(emailOrUsername)) {
         throw new BadRequestException('Invalid email');

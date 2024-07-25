@@ -92,6 +92,7 @@ export class AuthController {
         @Origin() origin: string | undefined,
         @Body() singInDto: SignInDto,
     ): Promise<void> {
+      console.log(singInDto)
         const result = await this.authService.signIn(singInDto, origin);
         this.saveRefreshCookie(res, result.refreshToken)
         .status(HttpStatus.OK)
