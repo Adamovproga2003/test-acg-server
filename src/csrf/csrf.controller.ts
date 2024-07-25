@@ -1,11 +1,12 @@
 import { Controller, Get, Res } from '@nestjs/common';
 import { Response } from 'express-serve-static-core';
 import { CsrfService } from './csrf.service';
+import { Public } from '../auth/decorators/public.decorator';
 
 @Controller('csrf-token')
 export class CsrfController {
   constructor(private readonly csrfService: CsrfService) {}
-
+  @Public()
   @Get()
   getCsrfToken(@Res() res: Response): void {
     const csrfToken = this.csrfService.generateToken();
