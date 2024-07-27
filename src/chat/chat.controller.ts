@@ -79,7 +79,25 @@ export class ChatController {
   })
   public async getUserChats(
     @CurrentUser() user_id: string,
+    
   ): Promise<any> {
     return await this.chatService.getUserChats(user_id);
+  }
+
+  @Post('/generate/:id')
+  @ApiCreatedResponse({
+    description: 'Get chats',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'The user is not logged in.',
+  })
+  @ApiBadRequestResponse({
+    description: 'Something is invalid on the request body',
+  })
+  public async generateCourse(
+    @CurrentUser() user_id: string,
+    @Param('id') chat_id: string,
+  ): Promise<any> {
+    return await this.chatService.generateCourse(user_id,chat_id);
   }
 }

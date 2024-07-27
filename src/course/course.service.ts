@@ -12,9 +12,11 @@ import { TopicEntity } from './entities/topic.entity'
 import { IResponseCourseMapper } from './mappers/responseCourse.mapper'
 import { IResponseTopicMapper } from './mappers/responseTopic.mapper'
 
-import { ApiHttpService } from 'src/api/api.service'
+import { ApiService } from 'src/api/api.service'
 import { GetCourseById } from './dtos/getCourseById.params'
 import { IPlan } from './interfaces/plan.interface'
+
+import { ConfigService } from '@nestjs/config';
   
 @Injectable()
 export class CourseService {
@@ -28,7 +30,8 @@ constructor(
     @InjectModel(SubtopicLinkEntity)
     private readonly subtopicLinkModel: typeof SubtopicLinkEntity,
     private readonly commonService: CommonService,
-    private readonly api: ApiHttpService,
+    private readonly apiService: ApiService,
+    private readonly configService: ConfigService,
 ) {}
 public async createCourse(userId:string, descriptionChat:string, plan: IPlan): Promise<CourseEntity> {
     const course = await this.courseModel.create({
@@ -64,6 +67,7 @@ public async createSubtopic(topicId:string, subTopic:string, links:any): Promise
         topicId: topicId,
         title: subTopic
     });
+    console.log(links)
     for(let i=0;i<links.links.length;i++){
         await this.createSubtopicLink(subTopicBD.subtopicId,links.links[i],links.brief[i])
     }
@@ -80,23 +84,26 @@ public async createSubtopicLink(subTopicId:string, link:string, brief:string): P
 }
 
 public async generateSubtopicLinks(userId:string,subtopics:string[] ,descriptionChat:string): Promise<any>{
-    let links = await this.api.axiosRef.post<any>(`/course/links/`, {
+    
+    let links = await this.apiService.post(`${this.configService.get<string>('modelApi.domain')}/course/links/`,{
         user_id: userId,
         topics: subtopics,
         description: descriptionChat,
     });
     return links;
+    
 }
 
-public async findCourseById(id: GetCourseById): Promise<IResponseCourseMapper> {
-    if (!validate(id.courseId)) {
+public async findCourseById(id: string): Promise<IResponseCourseMapper> {
+    console.log('id.courseId:'+id)
+    if (!validate(id)) {
         throw new BadRequestException('Invalid id');
     }
-    let course = await this.courseModel.findByPk(id.courseId);
+    let course = await this.courseModel.findByPk(id);
     let topicsId=[];
     let topics = await this.topicModel.findAll({
         where: {
-          courseId: id.courseId,
+          courseId: id,
         },
         order: [['createdAt', 'ASC']],
     });
@@ -106,20 +113,21 @@ public async findCourseById(id: GetCourseById): Promise<IResponseCourseMapper> {
     return IResponseCourseMapper.map(course, topicsId);
 }
 
-public async findTopicById(id: GetCourseById): Promise<IResponseTopicMapper> {
-    if (!validate(id.courseId)) {
+public async findTopicById(id: string): Promise<IResponseTopicMapper> {
+    if (!validate(id)) {
         throw new BadRequestException('Invalid id');
     }
-    let topic = await this.topicModel.findByPk(id.courseId);
+    let topic = await this.topicModel.findByPk(id);
     let subtopics=[];
     let subtopicsBD = await this.subtopicModel.findAll({
         where: {
-            topicId: id.courseId,
+            topicId: id,
         },
         order: [['createdAt', 'ASC']],
     });
+    console.log(subtopicsBD)
     subtopicsBD.forEach(subtopic=>{
-        let subtopicsLinksBD = this.subtopicModel.findAll({
+        let subtopicsLinksBD = this.subtopicLinkModel.findAll({
             where: {
                 subtopicId: subtopic.subtopicId,
             },

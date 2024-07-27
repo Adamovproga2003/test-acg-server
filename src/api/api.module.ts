@@ -1,30 +1,26 @@
 import { HttpModule, HttpService } from '@nestjs/axios';
-import { Module, OnModuleInit } from '@nestjs/common';
+import { Module } from '@nestjs/common';
+import { ApiTokenService } from './apiToken.service';
+import { ApiService } from './api.service';
 import { ConfigModule } from '@nestjs/config';
-import { ApiHttpService } from './api.service';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { AuthInterceptor } from './apiAuth.interceptor';
 
 @Module({
   imports: [
-    HttpModule.registerAsync({
-      useFactory: () => ({
-        baseURL: `http://host.docker.internal:8000/`,
-        headers: { 'Content-Type': 'application/json' },
-      }),
+    HttpModule,
+    ConfigModule.forRoot({
     }),
-    ConfigModule,
+    
   ],
   providers: [
+    ApiTokenService,
+    ApiService,
     {
-      provide: ApiHttpService,
-      useExisting: HttpService,
+      provide: APP_INTERCEPTOR,
+      useClass: AuthInterceptor,
     },
   ],
-  exports: [ApiHttpService],
+  exports: [ApiService],
 })
-export class ApiModule implements OnModuleInit {
-  constructor(private readonly httpService: HttpService) {}
-  onModuleInit() {
-    this.httpService.axiosRef.defaults.headers.common['Accept'] =
-      'application/json';
-  }
-}
+export class ApiModule {}
