@@ -62,8 +62,7 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
     }),
     */
     CacheModule.register({
-      ttl: 60*60*24*1000, // seconds
-      max: 10, // maximum number of items in cache
+      
       isGlobal: true,
     }),
     

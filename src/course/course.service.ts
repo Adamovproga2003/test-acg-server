@@ -15,7 +15,7 @@ import { IResponseTopicMapper } from './mappers/responseTopic.mapper'
 import { ApiService } from 'src/api/api.service'
 import { GetCourseById } from './dtos/getCourseById.params'
 import { IPlan } from './interfaces/plan.interface'
-
+import { lastValueFrom } from 'rxjs';
 import { ConfigService } from '@nestjs/config';
   
 @Injectable()
@@ -39,9 +39,9 @@ public async createCourse(userId:string, descriptionChat:string, plan: IPlan): P
         active:true
     });
 
-    Object.keys(plan).forEach(async key => {
-        await this.createTopic(userId, descriptionChat, course.courseId, key, plan[key])
-    })
+    await Promise.all(Object.keys(plan).map(key => 
+        this.createTopic(userId, descriptionChat, course.courseId, key, plan[key])
+    ));
     return course;
 }
 
@@ -50,22 +50,16 @@ public async createTopic(userId:string, descriptionChat:string,courseId:string, 
         courseId: courseId,
         title: topic
     });
-    console.log('topic')
-    console.log(topicBD)
-    console.log("descriptionChat")
-    console.log(descriptionChat)
+
     const topicA: { [key: string]: string[] } = {
         [topic]: subtopics
-      };
+    };
     let links = await this.generateSubtopicLinks(userId, topicA, descriptionChat);
-    console.log("links")
-    console.log(links)
 
-    for (let i=0;i<subtopics.length;i++ ) {
-        let subtopicLinks = [links[i]];
+    await Promise.all(subtopics.map((subtopic, i) => 
+        this.createSubtopic(topicBD.topicId, subtopic, [links[i]])
+    ));
 
-        await this.createSubtopic(topicBD.topicId, subtopics[i],subtopicLinks)
-    }
     return topicBD;
 }
 
@@ -74,10 +68,11 @@ public async createSubtopic(topicId:string, subTopic:string, links:any): Promise
         topicId: topicId,
         title: subTopic
     });
-    console.log(links)
-    for(let i=0;i<links.links.length;i++){
-        await this.createSubtopicLink(subTopicBD.subtopicId,links.links[i],links.brief[i])
-    }
+
+    await Promise.all(links.links.map((link, i) => 
+        this.createSubtopicLink(subTopicBD.subtopicId, link, links.brief[i])
+    ));
+
     return subTopicBD;
 }
 
@@ -90,23 +85,33 @@ public async createSubtopicLink(subTopicId:string, link:string, brief:string): P
     return subTopicLinkBD;
 }
 
-public async generateSubtopicLinks(userId:string,subtopics:{[key: string]: string[]} ,descriptionChat:string): Promise<any>{
-    console.log("shit here:");
-    console.log("topicsЫЫЫЫЫ:");
-    console.log(subtopics);
-    let links = await this.apiService.post(`${this.configService.get<string>('modelApi.domain')}/course/links/`,{
+public async generateSubtopicLinks(userId: string, subtopics: {[key: string]: string[]}, descriptionChat: string): Promise<any> {
+    console.log("Starting generateSubtopicLinks:");
+    console.log("subtopics:", subtopics);
+    
+    try {
+      const links = await lastValueFrom(this.apiService.post('/course/links', {
         user_id: userId,
         plan_part: subtopics,
         description: descriptionChat,
-    });
-
-    console.log("topics:");
-    console.log(subtopics);
-    console.log("links:");
-    console.log(links);
-    return links;
-    
-}
+      }));
+  
+      console.log("Received links:", links);
+      return links;
+    } catch (error) {
+      console.error("Error in generateSubtopicLinks:", error);
+      if (error.response) {
+        console.error("Response data:", error.response.data);
+        console.error("Response status:", error.response.status);
+        console.error("Response headers:", error.response.headers);
+      } else if (error.request) {
+        console.error("No response received:", error.request);
+      } else {
+        console.error("Error setting up request:", error.message);
+      }
+      throw error;
+    }
+  }
 
 public async findCourseById(id: string): Promise<IResponseCourseMapper> {
     console.log('id.courseId:'+id)
@@ -135,16 +140,16 @@ public async findTopicById(id: string): Promise<IResponseTopicMapper> {
         throw new BadRequestException('Invalid id');
     }
     let topic = await this.topicModel.findByPk(id);
-    let subtopics=[];
+    let subtopics = [];
     let subtopicsBD = await this.subtopicModel.findAll({
         where: {
             topicId: id,
         },
         order: [['createdAt', 'ASC']],
     });
-    console.log(subtopicsBD)
-    subtopicsBD.forEach(subtopic=>{
-        let subtopicsLinksBD = this.subtopicLinkModel.findAll({
+
+    for (const subtopic of subtopicsBD) {
+        let subtopicsLinksBD = await this.subtopicLinkModel.findAll({
             where: {
                 subtopicId: subtopic.subtopicId,
             },
@@ -155,8 +160,8 @@ public async findTopicById(id: string): Promise<IResponseTopicMapper> {
             text: subtopic.text,
             title: subtopic.title,
             links: subtopicsLinksBD
-        })
-    })
+        });
+    }
     return IResponseTopicMapper.map(topic, subtopics);
 }
 

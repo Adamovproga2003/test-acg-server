@@ -9,6 +9,7 @@ import { ChatMentorDto } from './dtos/chatMentorDto'
 import { ChatEntity } from './entities/chat.entity'
 import { PlanEntity } from './entities/plan.entity'
 import { ConfigService } from '@nestjs/config';
+import { lastValueFrom } from 'rxjs';
 
 type History = { bot: string } | { user: string };
 
@@ -88,13 +89,14 @@ export class ChatService {
     };
 
     try {
+      
       const {
         data: { answer, summary, plan_size,fix },
-      } = await this.apiService.post(`${this.configService.get<string>('modelApi.domain')}/chat/mentor`,{
+      } = await lastValueFrom(this.apiService.post('/chat/mentor',{
         user_input: ms,
         user_id,
         history: [{ bot: 'Hello' }, ...history],
-      });
+      }));
       console.log(answer, summary, plan_size,fix)
       await this.messageModel.create({
         chatId,
@@ -136,11 +138,11 @@ export class ChatService {
     try {
       const {
         data: { plan },
-      } = await this.apiService.post(`${this.configService.get<string>('modelApi.domain')}/chat/generate_plan`,{
+      } = await lastValueFrom(this.apiService.post('/chat/generate_plan',{
         user_id,
         summary,
         plan_size,
-      });
+      }));
       console.log(plan)
       await this.messageModel.create({
         chatId,
