@@ -102,7 +102,7 @@ export class ChatService {
         text: answer,
       });
 
-      if (summary!= null) {
+      if (summary!= null ) {
         return this.generatePlan(user_id, chatId, summary, plan_size);
       }
 
@@ -148,12 +148,13 @@ export class ChatService {
         text: JSON.stringify(plan),
       });
 
-      await this.planModel.create({
-        chatId: chatId,
+      await this.planModel.update({
         summary: summary,
         topics: plan,
         planSize: plan_size
-      });
+      },{where: {
+        chatId: chatId
+      }});
 
       return {plan, plan_size };
     } catch (error) {
@@ -165,7 +166,9 @@ export class ChatService {
   async generateCourse(user_id: string, chatId: string,){
     const {topics,summary, planSize} = await this.planModel.findOne({where: {
       chatId: chatId,
-    },})
+    }})
+    console.log('topicsSSSSSSSSs')
+    console.log(topics)
     let plan: IPlan = topics as IPlan
     console.log(plan)
     const {courseId} = await this.courseService.createCourse(user_id, summary, plan)

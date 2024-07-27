@@ -24,6 +24,7 @@ export class PlanEntity extends Model<PlanEntity> {
   @Column({
     type: DataType.UUID,
     allowNull: false,
+    unique: true,
   })
   public chatId: string;
 

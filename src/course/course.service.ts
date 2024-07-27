@@ -50,9 +50,16 @@ public async createTopic(userId:string, descriptionChat:string,courseId:string, 
         courseId: courseId,
         title: topic
     });
-
-    let links = await this.generateSubtopicLinks(userId, subtopics, descriptionChat);
-    
+    console.log('topic')
+    console.log(topicBD)
+    console.log("descriptionChat")
+    console.log(descriptionChat)
+    const topicA: { [key: string]: string[] } = {
+        [topic]: subtopics
+      };
+    let links = await this.generateSubtopicLinks(userId, topicA, descriptionChat);
+    console.log("links")
+    console.log(links)
 
     for (let i=0;i<subtopics.length;i++ ) {
         let subtopicLinks = [links[i]];
@@ -83,13 +90,20 @@ public async createSubtopicLink(subTopicId:string, link:string, brief:string): P
     return subTopicLinkBD;
 }
 
-public async generateSubtopicLinks(userId:string,subtopics:string[] ,descriptionChat:string): Promise<any>{
-    
+public async generateSubtopicLinks(userId:string,subtopics:{[key: string]: string[]} ,descriptionChat:string): Promise<any>{
+    console.log("shit here:");
+    console.log("topicsЫЫЫЫЫ:");
+    console.log(subtopics);
     let links = await this.apiService.post(`${this.configService.get<string>('modelApi.domain')}/course/links/`,{
         user_id: userId,
-        topics: subtopics,
+        plan_part: subtopics,
         description: descriptionChat,
     });
+
+    console.log("topics:");
+    console.log(subtopics);
+    console.log("links:");
+    console.log(links);
     return links;
     
 }
@@ -99,7 +113,10 @@ public async findCourseById(id: string): Promise<IResponseCourseMapper> {
     if (!validate(id)) {
         throw new BadRequestException('Invalid id');
     }
-    let course = await this.courseModel.findByPk(id);
+    let course = await this.courseModel.findOne({
+        where: {
+          courseId: id,
+        }});
     let topicsId=[];
     let topics = await this.topicModel.findAll({
         where: {
