@@ -1,12 +1,12 @@
-import { BadRequestException, Injectable } from '@nestjs/common'
-import { InjectModel } from '@nestjs/sequelize'
-import { ApiHttpService } from 'src/api/api.service'
-import { CourseService } from 'src/course/course.service'
-import { IPlan } from 'src/course/interfaces/plan.іnterface'
-import { MessageEntity } from 'src/message/entities/message.entity'
-import { validate } from 'uuid'
-import { ChatMentorDto } from './dtos/chatMentorDto'
-import { ChatEntity } from './entities/chat.entity'
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/sequelize';
+import { ApiHttpService } from 'src/api/api.service';
+import { CourseService } from 'src/course/course.service';
+import { IPlan } from 'src/course/interfaces/plan.іnterface';
+import { MessageEntity } from 'src/message/entities/message.entity';
+import { validate } from 'uuid';
+import { ChatMentorDto } from './dtos/chatMentorDto';
+import { ChatEntity } from './entities/chat.entity';
 
 type History = { bot: string } | { user: string };
 
@@ -25,11 +25,11 @@ export class ChatService {
         userId: user_id,
       },
       order: [['createdAt', 'ASC']],
-      attributes: ['chatId']
+      attributes: ['chatId'],
     });
     return chats;
   }
-  
+
   async getChatById(chat_id: string): Promise<ChatEntity> {
     if (!validate(chat_id)) {
       throw new BadRequestException('Invalid id');
@@ -44,12 +44,7 @@ export class ChatService {
     let chatId = chat_id;
 
     const history: History[] = [];
-    if (!chat_id) {
-      const chat = await this.chatModel.create({
-        userId: user_id,
-      });
-      chatId = chat.chatId;
-    } else {
+    if (chat_id) {
       // find all messages in the chat of the user and bot
       const messages = await this.messageModel.findAll({
         where: {
@@ -63,13 +58,6 @@ export class ChatService {
         }),
       );
     }
-
-    await this.messageModel.create({
-      chatId,
-      user: true,
-      text: ms,
-    });
-
     // request to ACG
     type IResponse = {
       text: string;
@@ -85,6 +73,17 @@ export class ChatService {
         history: [{ bot: 'Hello' }, ...history],
       });
 
+      const chat = await this.chatModel.create({
+        userId: user_id,
+      });
+      chatId = chat.chatId;
+
+      await this.messageModel.create({
+        chatId,
+        user: true,
+        text: ms,
+      });
+
       await this.messageModel.create({
         chatId,
         user: false,
@@ -97,8 +96,21 @@ export class ChatService {
 
       return { chatId, text, flag, history };
     } catch (error) {
-      const { response } = error;
-      console.error(response);
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        console.error(error.response.data);
+        console.error(error.response.status);
+        console.error(error.response.headers);
+      } else if (error.request) {
+        // The request was made but no response was received
+        // `error.request` is an instance of XMLHttpRequest in the browser
+        // and an instance of http.ClientRequest in node.js
+        console.error(error.request);
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        console.error('Error', error.message);
+      }
       return error;
     }
   }
@@ -130,12 +142,31 @@ export class ChatService {
         history,
       });
 
-      const {courseId} = await this.courseService.createCourse(user_id, dialog_description, plan)
+      // create Plan entity
+      // coming chatId
+      const { courseId } = await this.courseService.createCourse(
+        user_id,
+        dialog_description,
+        plan,
+      );
 
       return { dialog_description, plan, courseId };
     } catch (error) {
-      const { response } = error;
-      console.error(response);
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        console.error(error.response.data);
+        console.error(error.response.status);
+        console.error(error.response.headers);
+      } else if (error.request) {
+        // The request was made but no response was received
+        // `error.request` is an instance of XMLHttpRequest in the browser
+        // and an instance of http.ClientRequest in node.js
+        console.error(error.request);
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        console.error('Error', error.message);
+      }
       return error;
     }
   }
