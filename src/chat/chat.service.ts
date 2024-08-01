@@ -157,10 +157,24 @@ export class ChatService {
       } = await lastValueFrom(this.apiService.post('/chat/generate_plan/',{
         user_id,
         summary,
-        plan,
-      );
+        plan_size,
+      }));
+      console.log(plan)
+      await this.messageModel.create({
+        chatId,
+        user: true,
+        text: JSON.stringify(plan),
+      });
 
-      return { dialog_description: summary, plan, courseId };
+      await this.planModel.update({
+        summary: summary,
+        topics: plan,
+        planSize: plan_size
+      },{where: {
+        chatId: chatId
+      }});
+
+      return {plan, plan_size };
     } catch (error) {
       if (error.response) {
         // The request was made and the server responded with a status code
