@@ -88,8 +88,7 @@ export class ChatService {
     try {
       const {
         data: { answer, summary, plan_size },
-      } = await lastValueFrom(
-        this.apiService.post<IResponse>('/chat/mentor/', {
+      } = await lastValueFrom(this.apiService.post<IResponse>('/chat/mentor/', {
           user_input: ms,
           user_id,
           history: [{ bot: 'Hello' }, ...history],
@@ -154,17 +153,8 @@ export class ChatService {
 
     try {
       const {
-        data: { plan, description },
-      } = await lastValueFrom(
-        this.apiService.post<IResponse>('/chat/generate_plan/', {
-          user_id,
-          history,
-          summary,
-          plan_size,
-        }),
-      );
-
-      const { courseId } = await this.courseService.createCourse(
+        data: { plan },
+      } = await lastValueFrom(this.apiService.post('/chat/generate_plan/',{
         user_id,
         summary,
         plan,

@@ -50,6 +50,9 @@ export class CourseService {
         ),
       ),
     );
+
+    //this.createTopic(userId, descriptionChat, course.courseId, Object.keys(plan)[0], plan[Object.keys(plan)[0]])
+
     return course;
   }
 
@@ -69,18 +72,13 @@ export class CourseService {
       [topic]: subtopics,
     };
 
-    console.log('topicA', topicA);
-    const links = await this.generateSubtopicLinks(
-      userId,
-      topicA,
-      descriptionChat,
-    );
-
-    await Promise.all(
-      subtopics.map((subtopic, i) =>
-        this.createSubtopic(topicBD.topicId, subtopic, [links[i]]),
-      ),
-    );
+    let {data: {response} } = await this.generateSubtopicLinks(userId, topicA, descriptionChat);
+    console.log(subtopics)
+    console.log('linksSSSSSS')
+    console.log(response)
+    await Promise.all(subtopics.map((subtopic, i) => 
+        this.createSubtopic(topicBD.topicId, subtopic, response[subtopic])
+    ));
 
     return topicBD;
   }
@@ -95,11 +93,12 @@ export class CourseService {
       title: subTopic,
     });
 
-    await Promise.all(
-      links.links.map((link, i) =>
-        this.createSubtopicLink(subTopicBD.subtopicId, link, links.brief[i]),
-      ),
-    );
+    await Promise.all(links.map((link, i) => {
+        console.log('linkKKKKK')
+        console.log(link)
+        this.createSubtopicLink(subTopicBD.subtopicId, link.url, link.analyses)
+    }
+    ));
 
     return subTopicBD;
   }
@@ -126,6 +125,7 @@ export class CourseService {
     console.log('subtopics:', subtopics);
 
     try {
+
       const links = await lastValueFrom(
         this.apiService.post('/course/links/', {
           user_id: userId,
@@ -135,6 +135,7 @@ export class CourseService {
       );
 
       console.log('Received links:', links);
+
       return links;
     } catch (error) {
       console.error('Error in generateSubtopicLinks:', error);

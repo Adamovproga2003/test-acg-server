@@ -47,4 +47,6 @@ services:
       - EMAIL_PASSWORD=yvqc qxtl qobn idiq
       - CACHE_TTL=17280000
       - CACHE_MAX=10
-      - MODEL_DOMAIN=http://host.docker.internal:8000
+
+      - MODEL_DOMAIN=http://host.docker.internal:8000/api/v1
+
