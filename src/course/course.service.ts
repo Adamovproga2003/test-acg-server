@@ -38,10 +38,14 @@ public async createCourse(userId:string, descriptionChat:string, plan: IPlan): P
         userId: userId,
         active:true
     });
-
+    //this.createTopic(userId, descriptionChat, course.courseId, Object.keys(plan)[0], plan[Object.keys(plan)[0]])
+    
     await Promise.all(Object.keys(plan).map(key => 
         this.createTopic(userId, descriptionChat, course.courseId, key, plan[key])
+        
     ));
+    
+    
     return course;
 }
 
@@ -54,10 +58,12 @@ public async createTopic(userId:string, descriptionChat:string,courseId:string, 
     const topicA: { [key: string]: string[] } = {
         [topic]: subtopics
     };
-    let links = await this.generateSubtopicLinks(userId, topicA, descriptionChat);
-
+    let {data: {response} } = await this.generateSubtopicLinks(userId, topicA, descriptionChat);
+    console.log(subtopics)
+    console.log('linksSSSSSS')
+    console.log(response)
     await Promise.all(subtopics.map((subtopic, i) => 
-        this.createSubtopic(topicBD.topicId, subtopic, [links[i]])
+        this.createSubtopic(topicBD.topicId, subtopic, response[subtopic])
     ));
 
     return topicBD;
@@ -69,8 +75,11 @@ public async createSubtopic(topicId:string, subTopic:string, links:any): Promise
         title: subTopic
     });
 
-    await Promise.all(links.links.map((link, i) => 
-        this.createSubtopicLink(subTopicBD.subtopicId, link, links.brief[i])
+    await Promise.all(links.map((link, i) => {
+        console.log('linkKKKKK')
+        console.log(link)
+        this.createSubtopicLink(subTopicBD.subtopicId, link.url, link.analyses)
+    }
     ));
 
     return subTopicBD;
