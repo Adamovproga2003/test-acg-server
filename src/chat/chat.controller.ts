@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Post, Get } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiCreatedResponse,
@@ -29,7 +29,6 @@ export class ChatController {
     @Body() chatMentorDto: ChatMentorDto,
     @CurrentUser() user_id: string,
   ): Promise<any> {
-    console.log(user_id)
     return await this.chatService.sendMessage(chatMentorDto, user_id);
   }
 
@@ -61,9 +60,7 @@ export class ChatController {
   @ApiBadRequestResponse({
     description: 'Something is invalid on the request body',
   })
-  public async getChatById(
-    @Param('id') chat_id: string,
-  ): Promise<any> {
+  public async getChatById(@Param('id') chat_id: string): Promise<any> {
     return await this.chatService.getChatById(chat_id);
   }
 
@@ -77,10 +74,7 @@ export class ChatController {
   @ApiBadRequestResponse({
     description: 'Something is invalid on the request body',
   })
-  public async getUserChats(
-    @CurrentUser() user_id: string,
-    
-  ): Promise<any> {
+  public async getUserChats(@CurrentUser() user_id: string): Promise<any> {
     return await this.chatService.getUserChats(user_id);
   }
 
@@ -98,6 +92,6 @@ export class ChatController {
     @CurrentUser() user_id: string,
     @Param('id') chat_id: string,
   ): Promise<any> {
-    return await this.chatService.generateCourse(user_id,chat_id);
+    return await this.chatService.generateCourse(user_id, chat_id);
   }
 }
