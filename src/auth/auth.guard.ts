@@ -68,6 +68,7 @@ export class AuthGuard implements CanActivate {
         TokenTypeEnum.ACCESS,
       );
       req['user'] = userId;
+
       return true;
     } catch (_) {
       return isPublic;

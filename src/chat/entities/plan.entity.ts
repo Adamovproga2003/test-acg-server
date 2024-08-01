@@ -24,9 +24,23 @@ export class PlanEntity extends Model<PlanEntity> {
   @Column({
     type: DataType.UUID,
     allowNull: false,
+    unique: true,
   })
   public chatId: string;
 
+  
+  @Column({
+    type: DataType.TEXT,
+    allowNull: true,
+  })
+  public summary: string;
+
+  @Column({
+    type: DataType.STRING(255),
+    allowNull: true,
+  })
+  public planSize: string;
+  
   @Column({
     type: DataType.JSON,
     allowNull: true,

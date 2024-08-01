@@ -26,6 +26,7 @@ import { ConfigService } from '@nestjs/config';
 import { GetCourseById } from './dtos/getCourseById.params';
 import { GetTopicById } from './dtos/getTopicById.params';
 import { IResponseCourseMapper } from './mappers/responseCourse.mapper';
+import { IResponseTopic } from './interfaces/responseTopic.interface';
 
 
 
@@ -50,8 +51,8 @@ constructor(
     @ApiNotFoundResponse({
         description: 'Course is not found.',
     })
-    public async getCourseById(@Param() params: GetCourseById): Promise<IResponseCourse> {
-        const course = await this.courseService.findCourseById(params);
+    public async getCourseById(@Param('id') courseId: string,): Promise<IResponseCourse> {
+        const course = await this.courseService.findCourseById(courseId);
         return course;
     }
 
@@ -68,8 +69,8 @@ constructor(
     @ApiNotFoundResponse({
         description: 'Topic is not found.',
     })
-    public async getTopicById(@Param() params: GetTopicById): Promise<IResponseCourse> {
-        const course = await this.courseService.findCourseById(params);
+    public async getTopicById(@Param('id') topicId: string,): Promise<IResponseTopic> {
+        const course = await this.courseService.findTopicById(topicId);
         return course;
     }
     

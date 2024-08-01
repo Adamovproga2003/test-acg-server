@@ -46,8 +46,8 @@ export class MailerService {
     const { email} = user;
     const subject = 'Confirm your email';
     const html = this.templates.confirmation({
-      imageStorageLink: `https://${this.apiDomain}/static/images`,
-      link: `https://${this.domain}/login/${token}`,
+      imageStorageLink: `${this.apiDomain}/static/images`,
+      link: `${this.domain}/login/${token}`,
     });
     this.sendEmail(email, subject, html, 'A new confirmation email was sent.');
   }
@@ -56,8 +56,8 @@ export class MailerService {
     const { email } = user;
     const subject = 'Reset your password';
     const html = this.templates.resetPassword({
-      imageStorageLink: `https://${this.apiDomain}/static/images`,
-      link: `https://${this.domain}/reset-password/${token}`,
+      imageStorageLink: `${this.apiDomain}/static/images`,
+      link: `${this.domain}/reset-password/${token}`,
     });
     this.sendEmail(
       email,
