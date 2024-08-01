@@ -38,12 +38,13 @@ public async createCourse(userId:string, descriptionChat:string, plan: IPlan): P
         userId: userId,
         active:true
     });
-    //this.createTopic(userId, descriptionChat, course.courseId, Object.keys(plan)[0], plan[Object.keys(plan)[0]])
-    
+    this.createTopic(userId, descriptionChat, course.courseId, Object.keys(plan)[0], plan[Object.keys(plan)[0]])
+    /*
     await Promise.all(Object.keys(plan).map(key => 
         this.createTopic(userId, descriptionChat, course.courseId, key, plan[key])
         
     ));
+    */
     
     
     return course;
@@ -99,7 +100,7 @@ public async generateSubtopicLinks(userId: string, subtopics: {[key: string]: st
     console.log("subtopics:", subtopics);
     
     try {
-      const links = await lastValueFrom(this.apiService.post('/course/links', {
+      const links = await lastValueFrom(this.apiService.post('/course/links/', {
         user_id: userId,
         plan_part: subtopics,
         description: descriptionChat,
