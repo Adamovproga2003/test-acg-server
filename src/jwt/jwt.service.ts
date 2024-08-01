@@ -102,7 +102,7 @@ import {
         case TokenTypeEnum.ACCESS:
           const { privateKey, time: accessTime } = this.jwtConfig.access;
           return this.commonService.throwInternalError(
-            JwtService.generateTokenAsync({ user_id: user.user_id }, privateKey, {
+            JwtService.generateTokenAsync({ userId: user.userId }, privateKey, {
               ...jwtOptions,
               expiresIn: accessTime,
               algorithm: 'RS256',
@@ -114,7 +114,7 @@ import {
           return this.commonService.throwInternalError(
             JwtService.generateTokenAsync(
               {
-                user_id: user.user_id,
+                userId: user.userId,
                 tokenId: tokenId ?? v4(),
               },
               refreshSecret,
@@ -129,7 +129,7 @@ import {
           const { secret, time } = this.jwtConfig[tokenType];
           return this.commonService.throwInternalError(
             JwtService.generateTokenAsync(
-              { user_id: user.user_id},
+              { userId: user.userId},
               secret,
               {
                 ...jwtOptions,

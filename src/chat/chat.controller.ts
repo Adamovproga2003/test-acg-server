@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Post, Get } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiCreatedResponse,
@@ -29,7 +29,6 @@ export class ChatController {
     @Body() chatMentorDto: ChatMentorDto,
     @CurrentUser() user_id: string,
   ): Promise<any> {
-    console.log(user_id)
     return await this.chatService.sendMessage(chatMentorDto, user_id);
   }
 
@@ -51,23 +50,6 @@ export class ChatController {
     return await this.chatService.sendMessage(chatMentorDto, user_id, chat_id);
   }
 
-  @Post('/:id/plan')
-  @ApiCreatedResponse({
-    description: 'Get plan for user',
-  })
-  @ApiUnauthorizedResponse({
-    description: 'The user is not logged in.',
-  })
-  @ApiBadRequestResponse({
-    description: 'Something is invalid on the request body',
-  })
-  public async plan(
-    @CurrentUser() user_id: string,
-    @Param('id') chat_id: string,
-  ): Promise<any> {
-    return await this.chatService.generatePlan(user_id, chat_id);
-  }
-
   @Get('/:id')
   @ApiCreatedResponse({
     description: 'Get chat by id',
@@ -78,9 +60,7 @@ export class ChatController {
   @ApiBadRequestResponse({
     description: 'Something is invalid on the request body',
   })
-  public async getChatById(
-    @Param('id') chat_id: string,
-  ): Promise<any> {
+  public async getChatById(@Param('id') chat_id: string): Promise<any> {
     return await this.chatService.getChatById(chat_id);
   }
 
@@ -94,9 +74,24 @@ export class ChatController {
   @ApiBadRequestResponse({
     description: 'Something is invalid on the request body',
   })
-  public async getUserChats(
-    @CurrentUser() user_id: string,
-  ): Promise<any> {
+  public async getUserChats(@CurrentUser() user_id: string): Promise<any> {
     return await this.chatService.getUserChats(user_id);
+  }
+
+  @Post('/generate/:id')
+  @ApiCreatedResponse({
+    description: 'Get chats',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'The user is not logged in.',
+  })
+  @ApiBadRequestResponse({
+    description: 'Something is invalid on the request body',
+  })
+  public async generateCourse(
+    @CurrentUser() user_id: string,
+    @Param('id') chat_id: string,
+  ): Promise<any> {
+    return await this.chatService.generateCourse(user_id, chat_id);
   }
 }

@@ -92,6 +92,7 @@ export class AuthController {
         @Origin() origin: string | undefined,
         @Body() singInDto: SignInDto,
     ): Promise<void> {
+      console.log(singInDto)
         const result = await this.authService.signIn(singInDto, origin);
         this.saveRefreshCookie(res, result.refreshToken)
         .status(HttpStatus.OK)
@@ -261,7 +262,7 @@ export class AuthController {
     return res.cookie(this.cookieName, refreshToken, {
       secure: !this.testing,
       httpOnly: true,
-      sameSite: 'none',
+      sameSite: 'lax',
       signed: true,
       path: this.cookiePath,
       expires: new Date(Date.now() + this.refreshTime * 1000),

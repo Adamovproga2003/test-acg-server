@@ -17,6 +17,7 @@ export function config(): IConfig {
   return {
     id: process.env.APP_ID,
     domain: process.env.DOMAIN,
+    apiDomain: process.env.APIDOMAIN,
     port: parseInt(process.env.APP_PORT, 10),
     sequelizeConfig: {
       username: process.env.MYSQL_USERNAME,
@@ -54,9 +55,12 @@ export function config(): IConfig {
         pass: process.env.EMAIL_PASSWORD,
       },
     },
-    api: {
-      host: process.env.ACG_HOST,
-      port: parseInt(process.env.ACG_PORT, 10),
+    modelApi: {
+      domain: process.env.MODEL_DOMAIN,
+    },
+    cache:{
+      ttl:parseInt(process.env.CACHE_TTL, 10),
+      max:parseInt(process.env.CACHE_MAX, 10),
     },
     testing,
   };

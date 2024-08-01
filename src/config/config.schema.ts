@@ -11,6 +11,7 @@ export const validationSchema = Joi.object({
     MYSQL_DATABASE: Joi.string().required(),
     MONGO_CONNECTION_STRING: Joi.string().required(),
     DOMAIN: Joi.string().required(),
+    APIDOMAIN: Joi.string().required(),
     JWT_ACCESS_TIME: Joi.number().required(),
     JWT_CONFIRMATION_SECRET: Joi.string().required(),
     JWT_CONFIRMATION_TIME: Joi.number().required(),
@@ -25,5 +26,11 @@ export const validationSchema = Joi.object({
     EMAIL_SECURE: Joi.bool().required(),
     EMAIL_USER: Joi.string().email().required(),
     EMAIL_PASSWORD: Joi.string().required(),
+    
+    MODEL_DOMAIN: Joi.string().required(),
+
+    CACHE_TTL: Joi.number().required(),
+    CACHE_MAX: Joi.number().required(),
+
 
 });

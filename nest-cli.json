@@ -4,7 +4,8 @@
   "sourceRoot": "src",
   "compilerOptions": {
     "assets": [
-      "mailer/templates/**/*"
+      "mailer/templates/**/*",
+      "images/**/*"
     ],
     "watchAssets": true
   }

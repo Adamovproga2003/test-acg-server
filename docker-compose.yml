@@ -23,7 +23,8 @@ services:
       - APP_ID=00000000-0000-4000-8000-000000000000
       - NODE_ENV=development
       - APP_PORT=3001
-      - DOMAIN=localhost:3000
+      - DOMAIN=http://localhost:3000
+      - APIDOMAIN=http://localhost:3001
       - MYSQL_HOST=mysql_db
       - MYSQL_PORT=3306
       - MYSQL_USERNAME=serverConnection
@@ -44,3 +45,6 @@ services:
       - EMAIL_SECURE=true
       - EMAIL_USER=daniilpenkovskiy@gmail.com
       - EMAIL_PASSWORD=yvqc qxtl qobn idiq
+      - CACHE_TTL=17280000
+      - CACHE_MAX=10
+      - MODEL_DOMAIN=http://host.docker.internal:8000

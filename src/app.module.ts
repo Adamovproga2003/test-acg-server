@@ -22,10 +22,12 @@ import { ChatModule } from './chat/chat.module';
 import { CommonModule } from './common/common.module';
 import { JwtModule } from './jwt/jwt.module';
 import { CourseModule } from './course/course.module';
+import { StaticModule } from './static/static.module';
+import { CacheModule, CacheInterceptor } from '@nestjs/cache-manager';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 
 @Module({
   imports: [
-    ApiModule,
     ConfigModule.forRoot({
       isGlobal: true,
       validationSchema,
@@ -48,6 +50,22 @@ import { CourseModule } from './course/course.module';
     MongooseModule.forRoot(
       'mongodb+srv://ACG_server:1LZNEbYJ8SNT2x4E@landing.q5jufww.mongodb.net/landing?retryWrites=true&w=majority',
     ),
+    /*
+    CacheModule.register({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        ttl: configService.get('cache.ttl'), //milliseconds
+        isGlobal: true,
+        max: configService.get('cache.max'), // maximum number of items in cache
+      }),
+      inject: [ConfigService],
+    }),
+    */
+    CacheModule.register({
+      
+      isGlobal: true,
+    }),
+    
     LandingModule,
     CommonModule,
     UsersModule,
@@ -55,7 +73,9 @@ import { CourseModule } from './course/course.module';
     JwtModule,
     MailerModule,
     ChatModule,
-    CourseModule
+    CourseModule,
+    StaticModule,
+    ApiModule
   ],
   providers: [
     CsrfService,
@@ -64,6 +84,8 @@ import { CourseModule } from './course/course.module';
       provide: APP_GUARD,
       useClass: AuthGuard,
     },
+    
+    
   ],
   controllers: [CsrfController, AppController],
 })

@@ -16,6 +16,7 @@ export class MailerService {
   private readonly transport: Transporter<SMTPTransport.SentMessageInfo>;
   private readonly email: string;
   private readonly domain: string;
+  private readonly apiDomain: string;
   private readonly templates: ITemplates;
 
   constructor(private readonly configService: ConfigService) {
@@ -23,6 +24,7 @@ export class MailerService {
     this.transport = createTransport(emailConfig);
     this.email = `"My App" <${emailConfig.auth.user}>`;
     this.domain = this.configService.get<string>('domain');
+    this.apiDomain = this.configService.get<string>('apiDomain');
     this.loggerService = new Logger(MailerService.name);
     this.templates = {
       confirmation: MailerService.parseTemplate('confirmation.hbs'),
@@ -41,21 +43,21 @@ export class MailerService {
   }
 
   public sendConfirmationEmail(user: IUser, token: string): void {
-    const { email, name } = user;
+    const { email} = user;
     const subject = 'Confirm your email';
     const html = this.templates.confirmation({
-      name,
-      link: `https://${this.domain}/confirm/${token}`,
+      imageStorageLink: `${this.apiDomain}/static/images`,
+      link: `${this.domain}/login/${token}`,
     });
     this.sendEmail(email, subject, html, 'A new confirmation email was sent.');
   }
 
   public sendResetPasswordEmail(user: IUser, token: string): void {
-    const { email, name } = user;
+    const { email } = user;
     const subject = 'Reset your password';
     const html = this.templates.resetPassword({
-      name,
-      link: `https://${this.domain}/reset-password/${token}`,
+      imageStorageLink: `${this.apiDomain}/static/images`,
+      link: `${this.domain}/reset-password/${token}`,
     });
     this.sendEmail(
       email,

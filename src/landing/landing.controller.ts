@@ -27,7 +27,7 @@ export class LandingController {
             res.cookie('id', id, { 
                 httpOnly: true,
                 secure: true,
-                sameSite: 'none',
+                sameSite: 'lax',
                 encode: String,
                 //domain: 'artcogen.com',
                 expires: new Date(Date.now() + 30 *24 * 60 * 60 * 1000) 
@@ -48,7 +48,7 @@ export class LandingController {
             res.cookie('id', id, { 
                 httpOnly: true,
                 secure: true,
-                sameSite: 'none',
+                sameSite: 'lax',
                 encode: String,
                 //domain: 'artcogen.com',
                 expires: new Date(Date.now() + 30 *24 * 60 * 60 * 1000) 
@@ -69,7 +69,7 @@ export class LandingController {
             res.cookie('id', id, { 
                 httpOnly: true,
                 secure: true,
-                sameSite: 'none',
+                sameSite: 'lax',
                 encode: String,
                 //domain: 'artcogen.com',
                 expires: new Date(Date.now() + 30 *24 * 60 * 60 * 1000) 
@@ -91,7 +91,7 @@ export class LandingController {
             res.cookie('id', id, { 
                 httpOnly: true,
                 secure: true,
-                sameSite: 'none',
+                sameSite: 'lax',
                 encode: String,
                 //domain: 'artcogen.com',
                 expires: new Date(Date.now() + 30 *24 * 60 * 60 * 1000) 
