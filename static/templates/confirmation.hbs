@@ -1,0 +1,72 @@
+<html lang='en'>
+  <head>
+    <style>
+      .welcome-container { background-color: #fff; display: flex;
+      flex-direction: column; padding: 70px 58px; } .logo-container {
+      align-self: start; display: flex; align-items: flex-start; gap: 20px; }
+      .logo { aspect-ratio: 1.05; object-fit: auto; object-position: center;
+      width: 102px; align-self: start; max-width: 100%; } .mail-image {
+      aspect-ratio: 1.05; object-fit: auto; object-position: center; width:
+      100%; align-self: center; margin-top: 71px; } .welcome-heading { color:
+      #000; text-align: center; text-transform: uppercase; align-self: center;
+      margin-top: 87px; font: 500 48px Fixel Text, sans-serif; } .greeting {
+      color: #000; text-align: center; text-transform: uppercase; align-self:
+      start; margin-top: 118px; font: 500 24px Fixel Text, sans-serif; }
+      .intro-text { color: #000; align-self: start; margin-top: 35px; font: 500
+      24px Fixel Text, sans-serif; } .main-content { color: #000; align-self:
+      center; margin-top: 52px; font: 500 24px Fixel Text, sans-serif; }
+      .cta-heading { color: #000; text-align: center; text-transform: uppercase;
+      align-self: start; margin-top: 67px; font: 500 24px Fixel Text,
+      sans-serif; } .confirm-button { justify-content: center; border-radius:
+      8px; background-color: #ff6314; align-self: start; color: #fff;
+      text-align: center; text-transform: uppercase; margin: 58px 0 0 -5px;
+      padding: 20px 24px; font: 500 24px Fixel Text, sans-serif; border: none;
+      cursor: pointer; } .additional-info { color: #000; align-self: center;
+      margin-top: 84px; font: 500 24px Fixel Text, sans-serif; } .footer-text {
+      color: #000; align-self: center; margin-top: 47px; font: 500 24px Fixel
+      Text, sans-serif; } .footer-logo { aspect-ratio: 1; object-fit: auto;
+      object-position: center; width: 74px; margin: 108px 0 0 -2px; }
+    </style>
+  </head>
+  <body>
+    <main class='welcome-container'>
+      <header class='logo-container'>
+        <img
+          loading='lazy'
+          src='{{imageStorageLink}}/emailLogoPng.png'
+          class='logo'
+          alt='Company logo'
+        />
+      </header>
+      <img
+        loading='lazy'
+        class='mail-image'
+        alt='Mail image'
+        src='{{imageStorageLink}}/emailMailPng.png'
+      />
+      <h1 class='welcome-heading'>Welcome!</h1>
+      <h2 class='greeting'>Hey there, newbie!</h2>
+      <p class='main-content'>
+        Welcome to ACG! We are a platform that creates personalized courses
+        based on your goals and previous experience. Our main goal is to find
+        the most effective way to achieve your goals, provide you with relevant
+        and up-to-date materials and provide you with the necessary support at
+        every stage of your journey with us.
+      </p>
+      <h3 class='cta-heading'>
+        Let's take the first step to success together, click here to confirm
+        your email.
+      </h3>
+      <a href='{{link}}'><button class='confirm-button'>Confirm</button></a>
+
+      <footer>
+        <img
+          loading='lazy'
+          src='{{imageStorageLink}}/emailLogoPng.png'
+          class='footer-logo'
+          alt='Footer logo'
+        />
+      </footer>
+    </main>
+  </body>
+</html>

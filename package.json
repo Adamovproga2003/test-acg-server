@@ -30,6 +30,7 @@
     "@nestjs/passport": "^10.0.3",
     "@nestjs/platform-express": "^10.0.0",
     "@nestjs/sequelize": "^10.0.0",
+    "@nestjs/serve-static": "^4.0.2",
     "@nestjs/swagger": "^7.3.1",
     "@nestjs/throttler": "^5.0.1",
     "@types/handlebars": "^4.1.0",

@@ -1,30 +1,27 @@
+import { CacheModule } from '@nestjs/cache-manager';
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { APP_GUARD } from '@nestjs/core';
 import { MongooseModule } from '@nestjs/mongoose';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { AuthModule } from './auth/auth.module';
-import { config } from './config/config';
-import { validationSchema } from './config/config.schema';
-import { CsrfController } from './csrf/csrf.controller';
-import { CsrfService } from './csrf/csrf.service';
-import { LandingModule } from './landing/landing.module';
-import { UsersModule } from './users/users.module';
-
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
+import { ApiModule } from './api/api.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-
-import { MailerModule } from './mailer/mailer.module';
-
-import { APP_GUARD } from '@nestjs/core';
-import { ApiModule } from './api/api.module';
 import { AuthGuard } from './auth/auth.guard';
+import { AuthModule } from './auth/auth.module';
 import { ChatModule } from './chat/chat.module';
 import { CommonModule } from './common/common.module';
-import { JwtModule } from './jwt/jwt.module';
+import { config } from './config/config';
+import { validationSchema } from './config/config.schema';
 import { CourseModule } from './course/course.module';
-import { StaticModule } from './static/static.module';
-import { CacheModule, CacheInterceptor } from '@nestjs/cache-manager';
-import { APP_INTERCEPTOR } from '@nestjs/core';
+import { CsrfController } from './csrf/csrf.controller';
+import { CsrfService } from './csrf/csrf.service';
+import { JwtModule } from './jwt/jwt.module';
+import { LandingModule } from './landing/landing.module';
+import { MailerModule } from './mailer/mailer.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -62,10 +59,11 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
     }),
     */
     CacheModule.register({
-      
       isGlobal: true,
     }),
-    
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'static'),
+    }),
     LandingModule,
     CommonModule,
     UsersModule,
@@ -74,8 +72,8 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
     MailerModule,
     ChatModule,
     CourseModule,
-    StaticModule,
-    ApiModule
+    // StaticModule,
+    ApiModule,
   ],
   providers: [
     CsrfService,
@@ -84,8 +82,6 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
       provide: APP_GUARD,
       useClass: AuthGuard,
     },
-    
-    
   ],
   controllers: [CsrfController, AppController],
 })

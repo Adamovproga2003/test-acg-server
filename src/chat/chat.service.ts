@@ -88,7 +88,8 @@ export class ChatService {
     try {
       const {
         data: { answer, summary, plan_size },
-      } = await lastValueFrom(this.apiService.post<IResponse>('/chat/mentor/', {
+      } = await lastValueFrom(
+        this.apiService.post<IResponse>('/chat/mentor/', {
           user_input: ms,
           user_id,
           history: [{ bot: 'Hello' }, ...history],
@@ -154,27 +155,34 @@ export class ChatService {
     try {
       const {
         data: { plan },
-      } = await lastValueFrom(this.apiService.post('/chat/generate_plan/',{
-        user_id,
-        summary,
-        plan_size,
-      }));
-      console.log(plan)
+      } = await lastValueFrom(
+        this.apiService.post('/chat/generate_plan/', {
+          user_id,
+          summary,
+          plan_size,
+        }),
+      );
+      console.log(plan);
       await this.messageModel.create({
         chatId,
         user: true,
         text: JSON.stringify(plan),
       });
 
-      await this.planModel.update({
-        summary: summary,
-        topics: plan,
-        planSize: plan_size
-      },{where: {
-        chatId: chatId
-      }});
+      await this.planModel.update(
+        {
+          summary: summary,
+          topics: plan,
+          planSize: plan_size,
+        },
+        {
+          where: {
+            chatId: chatId,
+          },
+        },
+      );
 
-      return {plan, plan_size };
+      return { plan, plan_size };
     } catch (error) {
       if (error.response) {
         // The request was made and the server responded with a status code

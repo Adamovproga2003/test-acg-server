@@ -36,14 +36,14 @@ export class MailerService {
     templateName: string,
   ): Handlebars.TemplateDelegate<ITemplatedData> {
     const templateText = readFileSync(
-      join(__dirname, 'templates', templateName),
+      join(__dirname, '../../static/templates', templateName),
       'utf-8',
     );
     return Handlebars.compile<ITemplatedData>(templateText, { strict: true });
   }
 
   public sendConfirmationEmail(user: IUser, token: string): void {
-    const { email} = user;
+    const { email } = user;
     const subject = 'Confirm your email';
     const html = this.templates.confirmation({
       imageStorageLink: `${this.apiDomain}/static/images`,
